@@ -8,6 +8,7 @@ import { ProfilePage } from './pages/ProfilePage';
 import { SearchPage } from './pages/SearchPage';
 import { ShareVideoPage } from './pages/ShareVideoPage';
 import { FeedPage } from './pages/FeedPage';
+import { VideoDetailPage } from './pages/VideoDetailPage';
 import './index.css';
 
 // Protected Route wrapper
@@ -156,6 +157,7 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route path="/video/:videoId" element={<VideoDetailPage />} />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />

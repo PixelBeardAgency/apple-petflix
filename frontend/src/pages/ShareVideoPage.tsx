@@ -7,11 +7,12 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Header } from '../components/Header';
 
 export function ShareVideoPage() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
   const [youtubeUrl, setYoutubeUrl] = useState('');
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
@@ -78,39 +79,13 @@ export function ShareVideoPage() {
     }
   };
 
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/');
-  };
-
   if (!user) {
     return null;
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-charcoal/10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-foreground">
-            🐾 Petflix
-          </Link>
-          <nav className="flex items-center space-x-4">
-            <Link to="/feed">
-              <Button variant="ghost">Feed</Button>
-            </Link>
-            <Link to="/search">
-              <Button variant="ghost">Search</Button>
-            </Link>
-            <Link to="/profile">
-              <Button variant="ghost">Profile</Button>
-            </Link>
-            <Button variant="ghost" onClick={handleSignOut}>
-              Sign Out
-            </Button>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8">

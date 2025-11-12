@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from './ui/button';
 import { ThemeToggle } from './ThemeToggle';
+import { NotificationBell } from './NotificationBell';
 
 export function Header() {
   const { user, signOut } = useAuth();
@@ -23,9 +24,15 @@ export function Header() {
           <ThemeToggle />
           {user ? (
             <>
+              <NotificationBell />
               <Link to="/search">
                 <Button variant="ghost" size="sm">
                   Search
+                </Button>
+              </Link>
+              <Link to="/share">
+                <Button variant="ghost" size="sm">
+                  Share
                 </Button>
               </Link>
               <Link to="/feed">

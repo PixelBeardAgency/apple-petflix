@@ -69,3 +69,5 @@ This file contains a record of all user prompts during the Petflix implementatio
 ## Phase 4 Start
 
 28. "Sure, let's go to phase 4"
+
+29. "When does the follow button, comments section and notification bell get implemented?"

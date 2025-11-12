@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { followService } from '../services/follow';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Header } from '../components/Header';
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -13,11 +15,34 @@ export function ProfilePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [followerCount, setFollowerCount] = useState(0);
+  const [followingCount, setFollowingCount] = useState(0);
   const [formData, setFormData] = useState({
     username: profile?.username || '',
     bio: profile?.bio || '',
     profile_picture_url: profile?.profile_picture_url || '',
   });
+
+  useEffect(() => {
+    if (profile?.id) {
+      loadFollowCounts();
+    }
+  }, [profile?.id]);
+
+  const loadFollowCounts = async () => {
+    if (!profile?.id) return;
+
+    try {
+      const [followers, following] = await Promise.all([
+        followService.getFollowers(profile.id, 1, 0),
+        followService.getFollowing(profile.id, 1, 0),
+      ]);
+      setFollowerCount(followers.total);
+      setFollowingCount(following.total);
+    } catch (error) {
+      console.error('Failed to load follow counts:', error);
+    }
+  };
 
   const handleSignOut = async () => {
     await signOut();
@@ -80,25 +105,7 @@ export function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-charcoal/10">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-foreground">
-            🐾 Petflix
-          </Link>
-          <nav className="flex items-center space-x-4">
-            <Link to="/feed">
-              <Button variant="ghost">Feed</Button>
-            </Link>
-            <Link to="/search">
-              <Button variant="ghost">Search</Button>
-            </Link>
-            <Button variant="ghost" onClick={handleSignOut}>
-              Sign Out
-            </Button>
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Main Content */}
       <main className="container mx-auto px-4 py-8 max-w-2xl">
@@ -179,22 +186,30 @@ export function ProfilePage() {
                   <img
                     src={profile.profile_picture_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + profile.id}
                     alt={profile.username}
-                    className="w-20 h-20 rounded-full border-2 border-lightblue"
+                    className="w-20 h-20 rounded-full border-2 border-primary"
                   />
                   <div>
                     <h3 className="text-2xl font-bold text-foreground">{profile.username}</h3>
-                    <p className="text-foreground/60">{user.email}</p>
+                    <p className="text-muted-foreground">{user.email}</p>
+                    <div className="flex space-x-4 mt-2 text-sm">
+                      <span className="text-foreground">
+                        <strong>{followerCount}</strong> followers
+                      </span>
+                      <span className="text-foreground">
+                        <strong>{followingCount}</strong> following
+                      </span>
+                    </div>
                   </div>
                 </div>
 
                 {profile.bio && (
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Bio</h4>
-                    <p className="text-foreground/70">{profile.bio}</p>
+                    <p className="text-muted-foreground">{profile.bio}</p>
                   </div>
                 )}
 
-                <div className="text-sm text-foreground/60">
+                <div className="text-sm text-muted-foreground">
                   Member since {new Date(profile.created_at).toLocaleDateString()}
                 </div>
 
@@ -205,9 +220,9 @@ export function ProfilePage() {
         </Card>
 
         {/* Placeholder for videos, playlists, etc. */}
-        <div className="mt-8 text-center p-8 rounded-lg bg-lightblue/10 border border-lightblue/30">
+        <div className="mt-8 text-center p-8 rounded-lg bg-muted border border-border">
           <h3 className="text-xl font-semibold text-foreground mb-2">Coming Soon</h3>
-          <p className="text-foreground/70">
+          <p className="text-muted-foreground">
             Your shared videos, playlists, and followers will appear here in future updates.
           </p>
         </div>
