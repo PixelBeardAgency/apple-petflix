@@ -1,3 +1,4 @@
+import 'dotenv/config';
 import { google, youtube_v3 } from 'googleapis';
 import NodeCache from 'node-cache';
 import { logger } from './logger';
@@ -55,9 +56,14 @@ export class YouTubeService {
       cache.set(cacheKey, results);
 
       return results;
-    } catch (error) {
-      logger.error('YouTube API search error:', error);
-      throw new Error('Failed to search videos');
+    } catch (error: any) {
+      logger.error('YouTube API search error:', {
+        message: error.message,
+        code: error.code,
+        errors: error.errors,
+        details: error.response?.data,
+      });
+      throw new Error(`Failed to search videos: ${error.message}`);
     }
   }
 

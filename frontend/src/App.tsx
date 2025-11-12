@@ -1,9 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { ProfilePage } from './pages/ProfilePage';
+import { SearchPage } from './pages/SearchPage';
+import { ShareVideoPage } from './pages/ShareVideoPage';
 import './index.css';
 
 // Protected Route wrapper
@@ -12,8 +15,8 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream">
-        <div className="text-charcoal">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-foreground">Loading...</div>
       </div>
     );
   }
@@ -31,8 +34,8 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream">
-        <div className="text-charcoal">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-foreground">Loading...</div>
       </div>
     );
   }
@@ -47,41 +50,32 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 // Placeholder pages (to be implemented in future phases)
 function FeedPage() {
   return (
-    <div className="min-h-screen bg-cream p-8">
-      <h1 className="text-3xl font-bold text-charcoal">Feed Page</h1>
-      <p className="text-charcoal/70 mt-4">Coming soon in Phase 4...</p>
-    </div>
-  );
-}
-
-function SearchPage() {
-  return (
-    <div className="min-h-screen bg-cream p-8">
-      <h1 className="text-3xl font-bold text-charcoal">Search Page</h1>
-      <p className="text-charcoal/70 mt-4">Coming soon in Phase 3...</p>
+    <div className="min-h-screen bg-background p-8">
+      <h1 className="text-3xl font-bold text-foreground">Feed Page</h1>
+      <p className="text-muted-foreground mt-4">Coming soon in Phase 4...</p>
     </div>
   );
 }
 
 function TermsPage() {
   return (
-    <div className="min-h-screen bg-cream p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-charcoal mb-6">Terms of Service</h1>
-        <div className="text-charcoal/70 space-y-4">
+        <h1 className="text-3xl font-bold text-foreground mb-6">Terms of Service</h1>
+        <div className="text-muted-foreground space-y-4">
           <p>Last updated: November 12, 2024</p>
           <p>
             By using Petflix, you agree to these terms. Please read them carefully.
           </p>
-          <h2 className="text-xl font-semibold text-charcoal mt-6">Acceptance of Terms</h2>
+          <h2 className="text-xl font-semibold text-foreground mt-6">Acceptance of Terms</h2>
           <p>
             By accessing and using Petflix, you accept and agree to be bound by these Terms of Service.
           </p>
-          <h2 className="text-xl font-semibold text-charcoal mt-6">User Conduct</h2>
+          <h2 className="text-xl font-semibold text-foreground mt-6">User Conduct</h2>
           <p>
             You agree to use Petflix responsibly and not to share inappropriate content or engage in harmful behavior.
           </p>
-          <h2 className="text-xl font-semibold text-charcoal mt-6">Content</h2>
+          <h2 className="text-xl font-semibold text-foreground mt-6">Content</h2>
           <p>
             All videos are sourced from YouTube. Petflix is not responsible for the content of third-party videos.
           </p>
@@ -93,23 +87,23 @@ function TermsPage() {
 
 function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-cream p-8">
+    <div className="min-h-screen bg-background p-8">
       <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-charcoal mb-6">Privacy Policy</h1>
-        <div className="text-charcoal/70 space-y-4">
+        <h1 className="text-3xl font-bold text-foreground mb-6">Privacy Policy</h1>
+        <div className="text-muted-foreground space-y-4">
           <p>Last updated: November 12, 2024</p>
           <p>
             This Privacy Policy describes how Petflix collects, uses, and shares your personal information.
           </p>
-          <h2 className="text-xl font-semibold text-charcoal mt-6">Information We Collect</h2>
+          <h2 className="text-xl font-semibold text-foreground mt-6">Information We Collect</h2>
           <p>
             We collect information you provide directly to us, such as your email, username, and profile information.
           </p>
-          <h2 className="text-xl font-semibold text-charcoal mt-6">How We Use Your Information</h2>
+          <h2 className="text-xl font-semibold text-foreground mt-6">How We Use Your Information</h2>
           <p>
             We use your information to provide and improve our services, and to communicate with you.
           </p>
-          <h2 className="text-xl font-semibold text-charcoal mt-6">Data Security</h2>
+          <h2 className="text-xl font-semibold text-foreground mt-6">Data Security</h2>
           <p>
             We implement appropriate security measures to protect your personal information.
           </p>
@@ -163,6 +157,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/share"
+        element={
+          <ProtectedRoute>
+            <ShareVideoPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -172,11 +174,13 @@ function AppRoutes() {
 
 function App() {
   return (
-    <Router>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
-    </Router>
+    <ThemeProvider>
+      <Router>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </Router>
+    </ThemeProvider>
   );
 }
 

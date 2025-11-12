@@ -79,11 +79,11 @@ export function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-cream">
+    <div className="min-h-screen bg-background">
       {/* Header */}
       <header className="border-b border-charcoal/10">
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-2xl font-bold text-charcoal">
+          <Link to="/" className="text-2xl font-bold text-foreground">
             🐾 Petflix
           </Link>
           <nav className="flex items-center space-x-4">
@@ -182,19 +182,19 @@ export function ProfilePage() {
                     className="w-20 h-20 rounded-full border-2 border-lightblue"
                   />
                   <div>
-                    <h3 className="text-2xl font-bold text-charcoal">{profile.username}</h3>
-                    <p className="text-charcoal/60">{user.email}</p>
+                    <h3 className="text-2xl font-bold text-foreground">{profile.username}</h3>
+                    <p className="text-foreground/60">{user.email}</p>
                   </div>
                 </div>
 
                 {profile.bio && (
                   <div>
-                    <h4 className="font-semibold text-charcoal mb-2">Bio</h4>
-                    <p className="text-charcoal/70">{profile.bio}</p>
+                    <h4 className="font-semibold text-foreground mb-2">Bio</h4>
+                    <p className="text-foreground/70">{profile.bio}</p>
                   </div>
                 )}
 
-                <div className="text-sm text-charcoal/60">
+                <div className="text-sm text-foreground/60">
                   Member since {new Date(profile.created_at).toLocaleDateString()}
                 </div>
 
@@ -206,8 +206,8 @@ export function ProfilePage() {
 
         {/* Placeholder for videos, playlists, etc. */}
         <div className="mt-8 text-center p-8 rounded-lg bg-lightblue/10 border border-lightblue/30">
-          <h3 className="text-xl font-semibold text-charcoal mb-2">Coming Soon</h3>
-          <p className="text-charcoal/70">
+          <h3 className="text-xl font-semibold text-foreground mb-2">Coming Soon</h3>
+          <p className="text-foreground/70">
             Your shared videos, playlists, and followers will appear here in future updates.
           </p>
         </div>

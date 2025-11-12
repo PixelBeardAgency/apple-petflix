@@ -30,3 +30,30 @@ This file contains a record of all user prompts during the Petflix implementatio
 
 12. "Can you please record every past prompt I've given you, and also record this prompt with all future prompts in a file in the docs folder please? Just the prompts in a numbered list."
 
+## Phase 3 Start
+
+13. "Excellent, I have verfied that everything works up to this point, we can continue with phase 3."
+
+## Troubleshooting Phase 3
+
+14. Screenshot showing duplicate debounce export error in utils.ts
+
+15. Screenshot showing "NetworkError when attempting to fetch resource" and React DevTools errors
+
+16. "The only thing I have done is add a youtube API key to the env file. I still have a supabase URL in there, and didn't change that. However, when I do npm run dev in the backend, it says the supabaseUrl is required. I think this is the problem, but I'm unsure why it's cropped up as I've not changed anything."
+
+17. Screenshot showing "Failed to search videos" error with 500 status code
+
+18. "When I click 'Share Video', I get an error message: new row violates row-level security policy for table 'videos'"
+
+19. "Can I add a small task before we move onto phase 4 (but after we have got this stage tested successfully), which is to add a dark theme to the website with a toggle in the header. I'd like it to match the system if possible as default, but be overridden if the user engages with the toggles."
+
+20. "I 100% do have a supabase service key in my backend env file, but it's weirdly the same as the anon key. I double checked on supabase and this is definitely correct."
+
+21. "Can I request new keys here somehow? As they are 100% the same"
+
+22. Screenshot showing Supabase API keys page with identical anon and service_role keys
+
+23. "Okay I have created a new supabase project and updated it in my env files."
+
+24. "Okay brilliant, I have done all of that, I have changed my email configurations too, so that the user doesn't have to confirm via email on registration, and have disabled secure email change as per your previous instruction earlier on in the project. I successfully created an account and signed in, searched for a video and shared it."

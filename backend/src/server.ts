@@ -6,9 +6,9 @@ import rateLimit from 'express-rate-limit';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './services/logger';
 
-// Import routes (to be created)
-// import youtubeRoutes from './routes/youtube';
-// import videoRoutes from './routes/videos';
+// Import routes
+import youtubeRoutes from './routes/youtube';
+import videoRoutes from './routes/videos';
 // import profileRoutes from './routes/profiles';
 // import followRoutes from './routes/follows';
 // import commentRoutes from './routes/comments';
@@ -58,8 +58,8 @@ app.get('/health', (req, res) => {
 });
 
 // API routes
-// app.use('/api/youtube', youtubeRoutes);
-// app.use('/api/videos', videoRoutes);
+app.use('/api/youtube', youtubeRoutes);
+app.use('/api/videos', videoRoutes);
 // app.use('/api/users', profileRoutes);
 // app.use('/api/users', followRoutes);
 // app.use('/api/comments', commentRoutes);
