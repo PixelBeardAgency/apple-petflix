@@ -57,3 +57,15 @@ This file contains a record of all user prompts during the Petflix implementatio
 23. "Okay I have created a new supabase project and updated it in my env files."
 
 24. "Okay brilliant, I have done all of that, I have changed my email configurations too, so that the user doesn't have to confirm via email on registration, and have disabled secure email change as per your previous instruction earlier on in the project. I successfully created an account and signed in, searched for a video and shared it."
+
+## Dark Mode Feature
+
+25. "I don't think the dark mode switch works. My system is set to dark mode, however no matter how many times I press the theme switch, it doesn't go to a dark mode."
+
+26. "It still doesn't work. The cream colour stays dominant, the only difference that happens when I press the dark mode toggle is that the words in the headers change colour (and look invisible until I hover over them). I have verified this on multiple browsers"
+
+27. "The feed page is still cream, however if you think you will do this in the coming steps, tell me that but do not proceed with the next phase until I say so"
+
+## Phase 4 Start
+
+28. "Sure, let's go to phase 4"

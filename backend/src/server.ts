@@ -9,9 +9,10 @@ import { logger } from './services/logger';
 // Import routes
 import youtubeRoutes from './routes/youtube';
 import videoRoutes from './routes/videos';
-// import profileRoutes from './routes/profiles';
-// import followRoutes from './routes/follows';
-// import commentRoutes from './routes/comments';
+import followRoutes from './routes/follows';
+import commentRoutes from './routes/comments';
+import notificationRoutes from './routes/notifications';
+import feedRoutes from './routes/feed';
 // import playlistRoutes from './routes/playlists';
 // import tagRoutes from './routes/tags';
 // import moderationRoutes from './routes/moderation';
@@ -60,9 +61,10 @@ app.get('/health', (req, res) => {
 // API routes
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/videos', videoRoutes);
-// app.use('/api/users', profileRoutes);
-// app.use('/api/users', followRoutes);
-// app.use('/api/comments', commentRoutes);
+app.use('/api/users', followRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/feed', feedRoutes);
 // app.use('/api/playlists', playlistRoutes);
 // app.use('/api/tags', tagRoutes);
 // app.use('/api/moderation', moderationRoutes);

@@ -7,6 +7,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { ProfilePage } from './pages/ProfilePage';
 import { SearchPage } from './pages/SearchPage';
 import { ShareVideoPage } from './pages/ShareVideoPage';
+import { FeedPage } from './pages/FeedPage';
 import './index.css';
 
 // Protected Route wrapper
@@ -45,16 +46,6 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
   }
 
   return <>{children}</>;
-}
-
-// Placeholder pages (to be implemented in future phases)
-function FeedPage() {
-  return (
-    <div className="min-h-screen bg-background p-8">
-      <h1 className="text-3xl font-bold text-foreground">Feed Page</h1>
-      <p className="text-muted-foreground mt-4">Coming soon in Phase 4...</p>
-    </div>
-  );
 }
 
 function TermsPage() {
