@@ -3,6 +3,7 @@ import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { ProfilePage } from './pages/ProfilePage';
 import './index.css';
 
 // Protected Route wrapper
@@ -58,15 +59,6 @@ function SearchPage() {
     <div className="min-h-screen bg-cream p-8">
       <h1 className="text-3xl font-bold text-charcoal">Search Page</h1>
       <p className="text-charcoal/70 mt-4">Coming soon in Phase 3...</p>
-    </div>
-  );
-}
-
-function ProfilePage() {
-  return (
-    <div className="min-h-screen bg-cream p-8">
-      <h1 className="text-3xl font-bold text-charcoal">Profile Page</h1>
-      <p className="text-charcoal/70 mt-4">Coming soon in Phase 2...</p>
     </div>
   );
 }

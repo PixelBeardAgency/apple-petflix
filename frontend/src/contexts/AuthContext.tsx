@@ -1,7 +1,18 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { User as SupabaseUser } from '@supabase/supabase-js';
-import { authService, SignUpData, SignInData } from '../services/auth';
+import type { User as SupabaseUser } from '@supabase/supabase-js';
+import { authService } from '../services/auth';
 import type { User } from '../types';
+
+interface SignUpData {
+  email: string;
+  password: string;
+  username: string;
+}
+
+interface SignInData {
+  email: string;
+  password: string;
+}
 
 interface AuthContextType {
   user: SupabaseUser | null;
