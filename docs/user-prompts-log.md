@@ -83,3 +83,5 @@ This file contains a record of all user prompts during the Petflix implementatio
 ## Phase 5 Start
 
 33. "okay great, let's progress"
+
+34. "Can you implement those suggestions to fully integrate the playlists please? E.g Add an 'Add to Playlist' button on video detail pages, Add tags UI to playlist detail page, Create a moderation dashboard page for admins"

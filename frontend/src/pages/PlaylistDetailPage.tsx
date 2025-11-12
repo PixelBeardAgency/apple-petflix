@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { playlistService } from '../services/playlist';
+import { tagService } from '../services/tag';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { Button } from '../components/ui/button';
+import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 
 interface Playlist {
@@ -22,10 +24,14 @@ export function PlaylistDetailPage() {
   const [playlist, setPlaylist] = useState<Playlist | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [tags, setTags] = useState<any[]>([]);
+  const [addingTagFor, setAddingTagFor] = useState<string | null>(null);
+  const [newTagName, setNewTagName] = useState('');
 
   useEffect(() => {
     if (playlistId) {
       loadPlaylist();
+      loadTags();
     }
   }, [playlistId]);
 
@@ -43,6 +49,43 @@ export function PlaylistDetailPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const loadTags = async () => {
+    if (!playlistId) return;
+
+    try {
+      const data = await tagService.getPlaylistTags(playlistId);
+      setTags(data);
+    } catch (err) {
+      console.error('Failed to load tags:', err);
+    }
+  };
+
+  const handleAddTag = async (videoId: string) => {
+    if (!playlistId || !newTagName.trim()) return;
+
+    try {
+      const tag = await tagService.addTag(playlistId, videoId, newTagName);
+      setTags([...tags, tag]);
+      setNewTagName('');
+      setAddingTagFor(null);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to add tag');
+    }
+  };
+
+  const handleDeleteTag = async (tagId: string) => {
+    try {
+      await tagService.deleteTag(tagId);
+      setTags(tags.filter((t) => t.id !== tagId));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete tag');
+    }
+  };
+
+  const getVideoTags = (videoId: string) => {
+    return tags.filter((t) => t.video_id === videoId);
   };
 
   const handleRemoveVideo = async (videoId: string) => {
@@ -145,6 +188,76 @@ export function PlaylistDetailPage() {
                                 {video.description}
                               </p>
                             )}
+
+                            {/* Tags */}
+                            <div className="mb-4">
+                              <div className="flex flex-wrap gap-2 mb-2">
+                                {getVideoTags(video.id).map((tag) => (
+                                  <span
+                                    key={tag.id}
+                                    className="inline-flex items-center px-2 py-1 rounded-full text-xs bg-primary/20 text-primary"
+                                  >
+                                    {tag.tag_name}
+                                    {isOwner && (
+                                      <button
+                                        onClick={() => handleDeleteTag(tag.id)}
+                                        className="ml-1 hover:text-destructive"
+                                      >
+                                        ×
+                                      </button>
+                                    )}
+                                  </span>
+                                ))}
+                              </div>
+
+                              {isOwner && (
+                                <>
+                                  {addingTagFor === video.id ? (
+                                    <div className="flex space-x-2">
+                                      <Input
+                                        value={newTagName}
+                                        onChange={(e) => setNewTagName(e.target.value)}
+                                        placeholder="Tag name..."
+                                        maxLength={50}
+                                        onKeyPress={(e) => {
+                                          if (e.key === 'Enter') {
+                                            handleAddTag(video.id);
+                                          }
+                                        }}
+                                        className="text-sm h-8"
+                                      />
+                                      <Button
+                                        size="sm"
+                                        onClick={() => handleAddTag(video.id)}
+                                        disabled={!newTagName.trim()}
+                                      >
+                                        Add
+                                      </Button>
+                                      <Button
+                                        size="sm"
+                                        variant="ghost"
+                                        onClick={() => {
+                                          setAddingTagFor(null);
+                                          setNewTagName('');
+                                        }}
+                                      >
+                                        Cancel
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <Button
+                                      size="sm"
+                                      variant="ghost"
+                                      onClick={() => setAddingTagFor(video.id)}
+                                      className="text-xs"
+                                    >
+                                      + Add Tag
+                                    </Button>
+                                  )}
+                                </>
+                              )}
+                            </div>
+
                             <div className="flex space-x-2">
                               <a
                                 href={`https://www.youtube.com/watch?v=${video.youtube_video_id}`}

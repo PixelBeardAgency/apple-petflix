@@ -11,6 +11,7 @@ import { FeedPage } from './pages/FeedPage';
 import { VideoDetailPage } from './pages/VideoDetailPage';
 import { PlaylistsPage } from './pages/PlaylistsPage';
 import { PlaylistDetailPage } from './pages/PlaylistDetailPage';
+import { ModerationPage } from './pages/ModerationPage';
 import './index.css';
 
 // Protected Route wrapper
@@ -173,6 +174,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <PlaylistDetailPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/moderation"
+        element={
+          <ProtectedRoute>
+            <ModerationPage />
           </ProtectedRoute>
         }
       />

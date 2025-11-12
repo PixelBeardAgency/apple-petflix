@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { Comments } from '../components/Comments';
 import { FollowButton } from '../components/FollowButton';
+import { AddToPlaylistModal } from '../components/AddToPlaylistModal';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import type { Video } from '../types';
@@ -15,6 +16,7 @@ export function VideoDetailPage() {
   const [video, setVideo] = useState<Video | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showPlaylistModal, setShowPlaylistModal] = useState(false);
 
   useEffect(() => {
     if (videoId) {
@@ -96,13 +98,23 @@ export function VideoDetailPage() {
                     <FollowButton userId={video.user_id} currentUserId={user?.id} />
                   </div>
                 </CardHeader>
-                {video.description && (
-                  <CardContent>
-                    <p className="text-muted-foreground whitespace-pre-wrap">
+                <CardContent>
+                  {video.description && (
+                    <p className="text-muted-foreground whitespace-pre-wrap mb-4">
                       {video.description}
                     </p>
-                  </CardContent>
-                )}
+                  )}
+                  
+                  {user && (
+                    <Button
+                      onClick={() => setShowPlaylistModal(true)}
+                      variant="outline"
+                      className="w-full sm:w-auto"
+                    >
+                      📝 Add to Playlist
+                    </Button>
+                  )}
+                </CardContent>
               </Card>
 
               {/* Comments Section */}
@@ -124,6 +136,14 @@ export function VideoDetailPage() {
           )}
         </div>
       </main>
+
+      {/* Add to Playlist Modal */}
+      {showPlaylistModal && videoId && (
+        <AddToPlaylistModal
+          videoId={videoId}
+          onClose={() => setShowPlaylistModal(false)}
+        />
+      )}
     </div>
   );
 }
