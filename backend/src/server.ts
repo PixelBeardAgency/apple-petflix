@@ -13,9 +13,9 @@ import followRoutes from './routes/follows';
 import commentRoutes from './routes/comments';
 import notificationRoutes from './routes/notifications';
 import feedRoutes from './routes/feed';
-// import playlistRoutes from './routes/playlists';
-// import tagRoutes from './routes/tags';
-// import moderationRoutes from './routes/moderation';
+import playlistRoutes from './routes/playlists';
+import tagRoutes from './routes/tags';
+import moderationRoutes from './routes/moderation';
 
 dotenv.config();
 
@@ -65,9 +65,9 @@ app.use('/api/users', followRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/feed', feedRoutes);
-// app.use('/api/playlists', playlistRoutes);
-// app.use('/api/tags', tagRoutes);
-// app.use('/api/moderation', moderationRoutes);
+app.use('/api/playlists', playlistRoutes);
+app.use('/api/tags', tagRoutes);
+app.use('/api/moderation', moderationRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

@@ -40,6 +40,11 @@ export function Header() {
                   Feed
                 </Button>
               </Link>
+              <Link to="/playlists">
+                <Button variant="ghost" size="sm">
+                  Playlists
+                </Button>
+              </Link>
               <Link to="/profile">
                 <Button variant="ghost" size="sm">
                   Profile

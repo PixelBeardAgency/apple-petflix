@@ -71,3 +71,15 @@ This file contains a record of all user prompts during the Petflix implementatio
 28. "Sure, let's go to phase 4"
 
 29. "When does the follow button, comments section and notification bell get implemented?"
+
+## Troubleshooting Phase 4
+
+30. Screenshot showing 500 error: "Could not find a relationship between 'notifications' and 'profiles' in the schema cache"
+
+31. Screenshot showing Supabase warning about destructive operation (DROP COLUMN) - "Is this expected?"
+
+32. "The notifications bell is only on select pages (such as profile), is this not something we want to be accessible throughout the site?"
+
+## Phase 5 Start
+
+33. "okay great, let's progress"

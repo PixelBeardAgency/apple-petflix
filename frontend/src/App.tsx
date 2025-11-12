@@ -9,6 +9,8 @@ import { SearchPage } from './pages/SearchPage';
 import { ShareVideoPage } from './pages/ShareVideoPage';
 import { FeedPage } from './pages/FeedPage';
 import { VideoDetailPage } from './pages/VideoDetailPage';
+import { PlaylistsPage } from './pages/PlaylistsPage';
+import { PlaylistDetailPage } from './pages/PlaylistDetailPage';
 import './index.css';
 
 // Protected Route wrapper
@@ -158,6 +160,22 @@ function AppRoutes() {
         }
       />
       <Route path="/video/:videoId" element={<VideoDetailPage />} />
+      <Route
+        path="/playlists"
+        element={
+          <ProtectedRoute>
+            <PlaylistsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/playlists/:playlistId"
+        element={
+          <ProtectedRoute>
+            <PlaylistDetailPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
