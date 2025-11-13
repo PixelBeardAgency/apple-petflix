@@ -2,7 +2,6 @@ import dotenv from 'dotenv';
 import express, { Application } from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import rateLimit from 'express-rate-limit';
 import { errorHandler } from './middleware/errorHandler';
 import { logger } from './services/logger';
 
@@ -28,35 +27,79 @@ app.use(helmet({
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
-      frameSrc: ["'self'", "https://www.youtube.com", "https://youtube.com"],
+      frameSrc: ["'self'", "https://www.youtube.com", "https://youtube.com", "https://www.gstatic.com"],
       imgSrc: ["'self'", "data:", "https:", "http:"],
-      scriptSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://www.gstatic.com"],
       styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "https://*.supabase.co"],
     },
   },
+  crossOriginEmbedderPolicy: false,
+  crossOriginResourcePolicy: { policy: "cross-origin" },
 }));
+
+// Additional security headers
+app.use((_req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
+  next();
+});
 
 // CORS configuration
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:5173',
+  'http://localhost:5173',
+  'http://localhost:3000',
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, Postman, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  maxAge: 86400, // 24 hours
 }));
 
-// Body parser
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+// Body parser with size limits
+app.use(express.json({ limit: '1mb' })); // Limit JSON payload to 1MB
+app.use(express.urlencoded({ extended: true, limit: '1mb' }));
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-});
-app.use(limiter);
+// Import global rate limiter
+import { globalLimiter } from './middleware/rateLimit';
+import { sanitizeBody, preventSQLInjection } from './middleware/validation';
+import { performanceMonitoring, getHealthStatus, getMetricsData } from './services/monitoring';
+
+// Apply performance monitoring
+app.use(performanceMonitoring);
+
+// Apply global rate limiting
+app.use(globalLimiter);
+
+// Apply input sanitization
+app.use(sanitizeBody);
+app.use(preventSQLInjection);
 
 // Health check route
-app.get('/health', (req, res) => {
-  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+app.get('/health', (_req, res) => {
+  res.status(200).json(getHealthStatus());
+});
+
+// Metrics endpoint (protected - only for monitoring tools)
+app.get('/metrics', (_req, res) => {
+  // In production, add authentication for this endpoint
+  res.status(200).json(getMetricsData());
 });
 
 // API routes

@@ -108,4 +108,42 @@ export default defineConfig({
   server: {
     port: 5173,
   },
+  build: {
+    // Optimize production build
+    target: 'es2015',
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true, // Remove console.log in production
+        drop_debugger: true,
+      },
+    },
+    // Code splitting configuration
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          // Vendor chunks
+          'vendor-react': ['react', 'react-dom', 'react-router-dom'],
+          'vendor-ui': ['@radix-ui/react-popover', '@radix-ui/react-toast', '@radix-ui/react-dialog'],
+          'vendor-supabase': ['@supabase/supabase-js'],
+          // Feature chunks
+          'features-video': ['./src/services/video.ts', './src/services/youtube.ts'],
+          'features-social': ['./src/services/follow.ts', './src/services/comment.ts'],
+        },
+      },
+    },
+    // Chunk size warnings
+    chunkSizeWarningLimit: 1000, // 1000 KB
+    // Source maps (disable for production for smaller builds)
+    sourcemap: false,
+  },
+  // Performance optimizations
+  optimizeDeps: {
+    include: [
+      'react',
+      'react-dom',
+      'react-router-dom',
+      '@supabase/supabase-js',
+    ],
+  },
 });

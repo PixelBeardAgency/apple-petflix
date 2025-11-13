@@ -1,3 +1,4 @@
+import { Suspense, lazy } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
@@ -7,19 +8,28 @@ import { UpdatePrompt } from './components/UpdatePrompt';
 import { PushNotificationPrompt } from './components/PushNotificationPrompt';
 import { OnboardingManager } from './components/OnboardingManager';
 import { Toaster } from './components/ui/toaster';
-import { LandingPage } from './pages/LandingPage';
-import { LoginPage } from './pages/LoginPage';
-import { RegisterPage } from './pages/RegisterPage';
-import { ProfilePage } from './pages/ProfilePage';
-import { SearchPage } from './pages/SearchPage';
-import { ShareVideoPage } from './pages/ShareVideoPage';
-import { FeedPage } from './pages/FeedPage';
-import { VideoDetailPage } from './pages/VideoDetailPage';
-import { PlaylistsPage } from './pages/PlaylistsPage';
-import { PlaylistDetailPage } from './pages/PlaylistDetailPage';
-import { ModerationPage } from './pages/ModerationPage';
-import { NotificationSettingsPage } from './pages/NotificationSettingsPage';
 import './index.css';
+
+// Lazy load page components for code splitting and better performance
+const LandingPage = lazy(() => import('./pages/LandingPage').then(m => ({ default: m.LandingPage })));
+const LoginPage = lazy(() => import('./pages/LoginPage').then(m => ({ default: m.LoginPage })));
+const RegisterPage = lazy(() => import('./pages/RegisterPage').then(m => ({ default: m.RegisterPage })));
+const ProfilePage = lazy(() => import('./pages/ProfilePage').then(m => ({ default: m.ProfilePage })));
+const SearchPage = lazy(() => import('./pages/SearchPage').then(m => ({ default: m.SearchPage })));
+const ShareVideoPage = lazy(() => import('./pages/ShareVideoPage').then(m => ({ default: m.ShareVideoPage })));
+const FeedPage = lazy(() => import('./pages/FeedPage').then(m => ({ default: m.FeedPage })));
+const VideoDetailPage = lazy(() => import('./pages/VideoDetailPage').then(m => ({ default: m.VideoDetailPage })));
+const PlaylistsPage = lazy(() => import('./pages/PlaylistsPage').then(m => ({ default: m.PlaylistsPage })));
+const PlaylistDetailPage = lazy(() => import('./pages/PlaylistDetailPage').then(m => ({ default: m.PlaylistDetailPage })));
+const ModerationPage = lazy(() => import('./pages/ModerationPage').then(m => ({ default: m.ModerationPage })));
+const NotificationSettingsPage = lazy(() => import('./pages/NotificationSettingsPage').then(m => ({ default: m.NotificationSettingsPage })));
+
+// Loading component for Suspense fallback
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+  </div>
+);
 
 // Protected Route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -117,7 +127,8 @@ function PrivacyPage() {
 
 function AppRoutes() {
   return (
-    <Routes>
+    <Suspense fallback={<PageLoader />}>
+      <Routes>
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
       <Route path="/search" element={<SearchPage />} />
@@ -203,7 +214,8 @@ function AppRoutes() {
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+      </Routes>
+    </Suspense>
   );
 }
 
