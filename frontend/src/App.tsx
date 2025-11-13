@@ -1,6 +1,9 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
+import { PWAInstallPrompt } from './components/PWAInstallPrompt';
+import { OfflineIndicator } from './components/OfflineIndicator';
+import { UpdatePrompt } from './components/UpdatePrompt';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -198,6 +201,9 @@ function App() {
       <Router>
         <AuthProvider>
           <AppRoutes />
+          <PWAInstallPrompt />
+          <OfflineIndicator />
+          <UpdatePrompt />
         </AuthProvider>
       </Router>
     </ThemeProvider>
