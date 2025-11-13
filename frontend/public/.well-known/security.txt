@@ -1,0 +1,39 @@
+Contact: mailto:security@petflix.example.com
+Expires: 2026-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://petflix.example.com/.well-known/security.txt
+
+# Security Policy
+
+If you discover a security vulnerability, please report it to us via email.
+
+## Reporting Guidelines
+
+- Please provide detailed steps to reproduce the vulnerability
+- Include any relevant screenshots or proof of concept
+- Allow us reasonable time to address the issue before public disclosure
+- We will acknowledge your report within 48 hours
+
+## What to Report
+
+- SQL Injection
+- Cross-Site Scripting (XSS)
+- Cross-Site Request Forgery (CSRF)
+- Authentication/Authorization bypass
+- Remote Code Execution
+- Information disclosure
+- Any other security-related issues
+
+## What NOT to Report
+
+- Issues in third-party dependencies (report to them directly)
+- Social engineering attacks
+- Physical attacks
+- Denial of Service attacks
+
+## Recognition
+
+We appreciate responsible disclosure and will acknowledge security researchers who report valid vulnerabilities.
+
+Thank you for helping keep Petflix secure!
+

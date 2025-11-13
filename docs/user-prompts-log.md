@@ -114,3 +114,7 @@ This file contains a record of all user prompts during the Petflix implementatio
 ## Phase 11 Start
 
 42. "yeah, let's do phase 11"
+
+## Phase 12 Start
+
+43. "Yes, let's complete phase 12. Can you ensure that the project is thoroughly tested as much as you can to ensure every eventuality a human user can reach is tested, even things that shouldn't be done. Can you also make sure the project is ready for a seamless deployment?"

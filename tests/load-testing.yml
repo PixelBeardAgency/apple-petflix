@@ -1,0 +1,90 @@
+# Load Testing Configuration with Artillery
+# Run: npx artillery run tests/load-testing.yml
+
+config:
+  target: "http://localhost:3001"
+  phases:
+    # Warm-up phase
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    
+    # Ramp-up phase
+    - duration: 120
+      arrivalRate: 10
+      rampTo: 50
+      name: "Ramp up load"
+    
+    # Sustained load phase
+    - duration: 300
+      arrivalRate: 50
+      name: "Sustained load"
+    
+    # Spike phase
+    - duration: 60
+      arrivalRate: 100
+      name: "Spike"
+  
+  # Performance thresholds
+  ensure:
+    maxErrorRate: 1  # Max 1% error rate
+    p95: 1000        # 95th percentile response time < 1000ms
+    p99: 2000        # 99th percentile response time < 2000ms
+
+scenarios:
+  # Health check scenario
+  - name: "Health Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+  # Video search scenario
+  - name: "Search Videos"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/youtube/search"
+          qs:
+            q: "cute cats"
+            maxResults: 10
+          expect:
+            - statusCode: 200
+
+  # Feed retrieval scenario
+  - name: "Get Feed"
+    weight: 20
+    flow:
+      - get:
+          url: "/api/feed"
+          headers:
+            Authorization: "Bearer {{ $randomString() }}"
+          expect:
+            - statusCode: [200, 401]
+
+  # Video listing scenario
+  - name: "List Videos"
+    weight: 25
+    flow:
+      - get:
+          url: "/api/videos"
+          expect:
+            - statusCode: 200
+
+  # Metrics endpoint scenario
+  - name: "Check Metrics"
+    weight: 15
+    flow:
+      - get:
+          url: "/metrics"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+# Install: npm install -g artillery
+# Run: artillery run tests/load-testing.yml
+# Report: artillery run --output report.json tests/load-testing.yml && artillery report report.json
+

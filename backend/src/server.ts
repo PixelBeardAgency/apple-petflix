@@ -16,6 +16,7 @@ import playlistRoutes from './routes/playlists';
 import tagRoutes from './routes/tags';
 import moderationRoutes from './routes/moderation';
 import pushRoutes from './routes/push';
+import securityRoutes from './routes/security';
 
 dotenv.config();
 
@@ -32,7 +33,9 @@ app.use(helmet({
       scriptSrc: ["'self'", "'unsafe-inline'", "https://www.gstatic.com"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       connectSrc: ["'self'", "https://*.supabase.co"],
+      reportUri: "/api/csp-report",
     },
+    reportOnly: false,
   },
   crossOriginEmbedderPolicy: false,
   crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -113,6 +116,7 @@ app.use('/api/playlists', playlistRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/moderation', moderationRoutes);
 app.use('/api/push', pushRoutes);
+app.use('/api', securityRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);

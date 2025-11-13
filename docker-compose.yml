@@ -1,0 +1,78 @@
+version: '3.8'
+
+services:
+  # Backend API
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: petflix-backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - PORT=3001
+      - SUPABASE_URL=${SUPABASE_URL}
+      - SUPABASE_SERVICE_KEY=${SUPABASE_SERVICE_KEY}
+      - YOUTUBE_API_KEY=${YOUTUBE_API_KEY}
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost}
+      - VAPID_PUBLIC_KEY=${VAPID_PUBLIC_KEY}
+      - VAPID_PRIVATE_KEY=${VAPID_PRIVATE_KEY}
+      - VAPID_SUBJECT=${VAPID_SUBJECT}
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 40s
+    networks:
+      - petflix-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # Frontend Web App
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: petflix-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:80/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+    networks:
+      - petflix-network
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+networks:
+  petflix-network:
+    driver: bridge
+
+# For production with reverse proxy (e.g., Traefik, Nginx)
+# Uncomment and configure labels as needed:
+#
+# labels:
+#   - "traefik.enable=true"
+#   - "traefik.http.routers.petflix-frontend.rule=Host(`petflix.example.com`)"
+#   - "traefik.http.routers.petflix-frontend.entrypoints=websecure"
+#   - "traefik.http.routers.petflix-frontend.tls.certresolver=letsencrypt"
+#   - "traefik.http.routers.petflix-backend.rule=Host(`api.petflix.example.com`)"
+#   - "traefik.http.routers.petflix-backend.entrypoints=websecure"
+#   - "traefik.http.routers.petflix-backend.tls.certresolver=letsencrypt"
+
