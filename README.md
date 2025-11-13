@@ -202,20 +202,31 @@ VITE_VAPID_PUBLIC_KEY=your_vapid_public_key
 
 ## Deployment
 
-### Backend Deployment (Railway/Render/DigitalOcean)
+### Quick Deploy to Vercel (Recommended) 🚀
 
-1. Create a new service
-2. Connect your GitHub repository
-3. Set environment variables
-4. Deploy
+Petflix is optimized for Vercel deployment!
 
-### Frontend Deployment (Vercel/Netlify)
+**3-Minute Deploy:**
+1. Push to GitHub
+2. Import to Vercel (https://vercel.com/new)
+3. Add environment variables
+4. Click Deploy
 
-1. Connect your GitHub repository
-2. Set build command: `npm run build`
-3. Set output directory: `dist`
-4. Set environment variables
-5. Deploy
+See [VERCEL-QUICKSTART.md](./VERCEL-QUICKSTART.md) for step-by-step guide.
+
+### Alternative Deployments
+
+**Docker/Self-Hosted:**
+See [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md) for:
+- Docker and Docker Compose setup
+- Self-hosted deployment
+- Production environment configuration
+- Database setup and migrations
+- Monitoring and logging
+- Security checklist
+
+**Complete Vercel Guide:**
+See [docs/VERCEL-DEPLOYMENT.md](./docs/VERCEL-DEPLOYMENT.md) for complete Vercel documentation.
 
 ### Database (Supabase)
 
