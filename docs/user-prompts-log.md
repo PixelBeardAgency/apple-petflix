@@ -97,3 +97,12 @@ This file contains a record of all user prompts during the Petflix implementatio
 ## Phase 8 Start
 
 37. "Okay let's go with phase 8. I'd like to do all the testing at the end of the initial development, is the project set up for that to be the case? If not, could you make it so please"
+
+## Phase 8 Troubleshooting
+
+38. Error screenshot - Missing @radix-ui/react-popover package
+39. Error screenshot - CastConnected icon doesn't exist in lucide-react
+
+## Phase 9 Start
+
+40. "That fixed it, thank you. Now, let's continue."

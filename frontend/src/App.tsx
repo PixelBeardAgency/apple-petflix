@@ -5,6 +5,7 @@ import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { UpdatePrompt } from './components/UpdatePrompt';
 import { PushNotificationPrompt } from './components/PushNotificationPrompt';
+import { OnboardingManager } from './components/OnboardingManager';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -211,6 +212,7 @@ function App() {
       <Router>
         <AuthProvider>
           <AppRoutes />
+          <OnboardingManager />
           <PWAInstallPrompt />
           <PushNotificationPrompt />
           <OfflineIndicator />

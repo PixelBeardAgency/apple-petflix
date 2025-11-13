@@ -25,17 +25,17 @@ export function Header() {
           {user ? (
             <>
               <NotificationBell />
-              <Link to="/search">
+              <Link to="/search" data-onboarding="search">
                 <Button variant="ghost" size="sm">
                   Search
                 </Button>
               </Link>
-              <Link to="/share">
+              <Link to="/share" data-onboarding="share">
                 <Button variant="ghost" size="sm">
                   Share
                 </Button>
               </Link>
-              <Link to="/feed">
+              <Link to="/feed" data-onboarding="feed">
                 <Button variant="ghost" size="sm">
                   Feed
                 </Button>
@@ -45,7 +45,7 @@ export function Header() {
                   Playlists
                 </Button>
               </Link>
-              <Link to="/profile">
+              <Link to="/profile" data-onboarding="profile">
                 <Button variant="ghost" size="sm">
                   Profile
                 </Button>
