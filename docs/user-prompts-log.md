@@ -89,3 +89,7 @@ This file contains a record of all user prompts during the Petflix implementatio
 ## Phase 6 Start
 
 35. "no, let's go with the next phase!"
+
+## Phase 7 Start
+
+36. "Let's start phase 7, everything you've mentioned there that's not yet implemented I want implemented at some point in the future under the correct phase. Can you also implement any unit tests in the appropriate places?"
