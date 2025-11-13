@@ -5,6 +5,7 @@ import { authenticateUser, optionalAuth, AuthRequest } from '../middleware/auth'
 import { commentLimiter } from '../middleware/rateLimit';
 import { AppError } from '../middleware/errorHandler';
 import { logger } from '../services/logger';
+import { sendPushNotification } from './push';
 
 const router = Router();
 
@@ -111,6 +112,18 @@ router.post('/', authenticateUser, commentLimiter, async (req: AuthRequest, res,
 
     // Create notification for video owner (if not commenting on own video)
     if (video.user_id !== userId) {
+      const { data: commenterProfile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single();
+
+      const { data: videoData } = await supabase
+        .from('videos')
+        .select('title')
+        .eq('id', videoId)
+        .single();
+
       await supabase.from('notifications').insert({
         user_id: video.user_id,
         type: 'comment',
@@ -118,6 +131,15 @@ router.post('/', authenticateUser, commentLimiter, async (req: AuthRequest, res,
         related_user_id: userId,
         related_video_id: videoId,
       });
+
+      // Send push notification
+      sendPushNotification(
+        video.user_id,
+        'New Comment',
+        `${commenterProfile?.username || 'Someone'} commented on your video "${videoData?.title || 'your video'}"`,
+        `/video/${videoId}`,
+        'comment'
+      );
     }
 
     res.status(201).json(comment);

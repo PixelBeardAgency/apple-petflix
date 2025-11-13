@@ -10,8 +10,15 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'apple-touch-icon.png'],
+      srcDir: 'src',
+      filename: 'sw.ts',
+      strategies: 'injectManifest',
+      injectManifest: {
+        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+      },
       devOptions: {
         enabled: true, // Enable PWA in dev mode for testing
+        type: 'module',
       },
       manifest: {
         name: 'Petflix - Pet Video Sharing',
@@ -88,93 +95,6 @@ export default defineConfig({
             description: 'Share a new pet video',
             url: '/share',
             icons: [{ src: '/icons/icon-96x96.png', sizes: '96x96' }],
-          },
-        ],
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
-        // Clean up old caches
-        cleanupOutdatedCaches: true,
-        // Skip waiting and claim clients immediately
-        skipWaiting: true,
-        clientsClaim: true,
-        runtimeCaching: [
-          // API calls - Network first with cache fallback
-          {
-            urlPattern: /^https?:\/\/.*\/api\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'api-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 5, // 5 minutes
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-              networkTimeoutSeconds: 10,
-            },
-          },
-          // Supabase API - Network first with longer cache
-          {
-            urlPattern: /^https:\/\/.*\.supabase\.co\/.*/i,
-            handler: 'NetworkFirst',
-            options: {
-              cacheName: 'supabase-cache',
-              expiration: {
-                maxEntries: 30,
-                maxAgeSeconds: 60 * 60 * 24, // 1 day
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-              networkTimeoutSeconds: 10,
-            },
-          },
-          // YouTube thumbnails - Cache first for performance
-          {
-            urlPattern: /^https:\/\/i\.ytimg\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'youtube-thumbnails',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          // YouTube images - Cache first
-          {
-            urlPattern: /^https:\/\/.*\.googleapis\.com\/.*/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'google-apis-cache',
-              expiration: {
-                maxEntries: 50,
-                maxAgeSeconds: 60 * 60 * 24 * 7, // 7 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
-          },
-          // Profile pictures and external images
-          {
-            urlPattern: /^https:\/\/.*(\.png|\.jpg|\.jpeg|\.svg|\.gif|\.webp)/i,
-            handler: 'CacheFirst',
-            options: {
-              cacheName: 'image-cache',
-              expiration: {
-                maxEntries: 100,
-                maxAgeSeconds: 60 * 60 * 24 * 30, // 30 days
-              },
-              cacheableResponse: {
-                statuses: [0, 200],
-              },
-            },
           },
         ],
       },

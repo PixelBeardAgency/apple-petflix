@@ -4,6 +4,7 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { PWAInstallPrompt } from './components/PWAInstallPrompt';
 import { OfflineIndicator } from './components/OfflineIndicator';
 import { UpdatePrompt } from './components/UpdatePrompt';
+import { PushNotificationPrompt } from './components/PushNotificationPrompt';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -15,6 +16,7 @@ import { VideoDetailPage } from './pages/VideoDetailPage';
 import { PlaylistsPage } from './pages/PlaylistsPage';
 import { PlaylistDetailPage } from './pages/PlaylistDetailPage';
 import { ModerationPage } from './pages/ModerationPage';
+import { NotificationSettingsPage } from './pages/NotificationSettingsPage';
 import './index.css';
 
 // Protected Route wrapper
@@ -188,6 +190,14 @@ function AppRoutes() {
           </ProtectedRoute>
         }
       />
+      <Route
+        path="/settings/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationSettingsPage />
+          </ProtectedRoute>
+        }
+      />
 
       {/* Catch all - redirect to home */}
       <Route path="*" element={<Navigate to="/" replace />} />
@@ -202,6 +212,7 @@ function App() {
         <AuthProvider>
           <AppRoutes />
           <PWAInstallPrompt />
+          <PushNotificationPrompt />
           <OfflineIndicator />
           <UpdatePrompt />
         </AuthProvider>

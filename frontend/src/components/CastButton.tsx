@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Cast, CastConnected, Wifi, WifiOff } from 'lucide-react';
+import { Cast, Wifi, WifiOff } from 'lucide-react';
 import { Button } from './ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from './ui/popover';
-import { castService, CastDevice, CastSession } from '../services/cast';
+import { castService } from '../services/cast';
+import type { CastDevice, CastSession } from '../services/cast';
 
 interface CastButtonProps {
   videoId: string;
@@ -120,11 +121,7 @@ export function CastButton({ videoId, videoTitle, thumbnailUrl, className = '' }
           className={className}
           title={isConnected ? 'Connected to cast device' : 'Cast to TV'}
         >
-          {isConnected ? (
-            <CastConnected className="h-4 w-4" />
-          ) : (
-            <Cast className="h-4 w-4" />
-          )}
+          <Cast className={`h-4 w-4 ${isConnected ? 'fill-current' : ''}`} />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-80">

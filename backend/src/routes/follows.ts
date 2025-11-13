@@ -4,6 +4,7 @@ import { createClient } from '@supabase/supabase-js';
 import { authenticateUser, AuthRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 import { logger } from '../services/logger';
+import { sendPushNotification } from './push';
 
 const router = Router();
 
@@ -70,12 +71,27 @@ router.post('/:userId/follow', authenticateUser, async (req: AuthRequest, res, n
     }
 
     // Create notification for the followed user
+    const { data: followerProfile } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('id', followerId)
+      .single();
+
     await supabase.from('notifications').insert({
       user_id: userId,
       type: 'follow',
       content: `New follower`,
       related_user_id: followerId,
     });
+
+    // Send push notification
+    sendPushNotification(
+      userId,
+      'New Follower',
+      `${followerProfile?.username || 'Someone'} started following you!`,
+      '/profile',
+      'follow'
+    );
 
     res.status(201).json(data);
   } catch (error) {

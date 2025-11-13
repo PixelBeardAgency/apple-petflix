@@ -16,6 +16,7 @@ import feedRoutes from './routes/feed';
 import playlistRoutes from './routes/playlists';
 import tagRoutes from './routes/tags';
 import moderationRoutes from './routes/moderation';
+import pushRoutes from './routes/push';
 
 dotenv.config();
 
@@ -68,6 +69,7 @@ app.use('/api/feed', feedRoutes);
 app.use('/api/playlists', playlistRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/moderation', moderationRoutes);
+app.use('/api/push', pushRoutes);
 
 // Error handling middleware (must be last)
 app.use(errorHandler);
