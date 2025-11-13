@@ -6,6 +6,7 @@ import { OfflineIndicator } from './components/OfflineIndicator';
 import { UpdatePrompt } from './components/UpdatePrompt';
 import { PushNotificationPrompt } from './components/PushNotificationPrompt';
 import { OnboardingManager } from './components/OnboardingManager';
+import { Toaster } from './components/ui/toaster';
 import { LandingPage } from './pages/LandingPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -217,6 +218,7 @@ function App() {
           <PushNotificationPrompt />
           <OfflineIndicator />
           <UpdatePrompt />
+          <Toaster />
         </AuthProvider>
       </Router>
     </ThemeProvider>

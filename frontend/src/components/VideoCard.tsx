@@ -13,7 +13,7 @@ interface VideoCardProps {
 
 export function VideoCard({ video, onShare, showShareButton = true, isAuthenticated = false }: VideoCardProps) {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
+    <Card className="overflow-hidden hover-lift fade-in">
       <div className="relative aspect-video">
         <img
           src={video.thumbnail}

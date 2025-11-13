@@ -106,3 +106,7 @@ This file contains a record of all user prompts during the Petflix implementatio
 ## Phase 9 Start
 
 40. "That fixed it, thank you. Now, let's continue."
+
+## Phase 10 Start
+
+41. "Let's do phase 10 sure!"
