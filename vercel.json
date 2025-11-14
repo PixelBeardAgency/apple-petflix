@@ -1,37 +1,23 @@
 {
   "version": 2,
-  "name": "petflix",
-  "builds": [
-    {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": {
-        "distDir": "frontend/dist"
-      }
-    },
-    {
-      "src": "backend/package.json",
-      "use": "@vercel/node"
-    }
-  ],
+  "buildCommand": "cd frontend && npm install && npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "echo 'Using custom build command'",
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "/backend/api"
-    },
-    {
-      "source": "/health",
-      "destination": "/backend/api"
-    },
-    {
-      "source": "/metrics",
-      "destination": "/backend/api"
+      "destination": "/api/index.js"
     },
     {
       "source": "/(.*)",
-      "destination": "/frontend/$1"
+      "destination": "/index.html"
     }
   ],
+  "functions": {
+    "api/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
   "env": {
     "NODE_ENV": "production"
   },
