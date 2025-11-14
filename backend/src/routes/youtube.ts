@@ -129,20 +129,22 @@ router.post('/validate', async (req, res, next) => {
     const validation = youtubeService.isValidYouTubeUrl(url);
 
     if (!validation.valid) {
-      return res.json({
+      res.json({
         valid: false,
         message: 'Invalid YouTube URL',
       });
+      return;
     }
 
     // Get video details to confirm it exists
     const video = await youtubeService.getVideoDetails(validation.videoId!);
 
     if (!video) {
-      return res.json({
+      res.json({
         valid: false,
         message: 'Video not found or unavailable',
       });
+      return;
     }
 
     res.json({
@@ -166,7 +168,7 @@ router.post('/validate', async (req, res, next) => {
  * GET /api/youtube/quota
  * Get current YouTube API quota usage (admin only for now)
  */
-router.get('/quota', async (req, res, next) => {
+router.get('/quota', async (_req, res, next) => {
   try {
     const quotaInfo = youtubeService.getQuotaUsage();
     res.json(quotaInfo);

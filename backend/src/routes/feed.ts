@@ -43,12 +43,13 @@ router.get('/', authenticateUser, async (req: AuthRequest, res, next) => {
     if (!following || following.length === 0) {
       logger.info(`User ${userId} is not following anyone`);
       // No following, return empty feed
-      return res.json({
+      res.json({
         videos: [],
         total: 0,
         limit: parseInt(limit as string),
         offset: parseInt(offset as string),
       });
+      return;
     }
 
     const followingIds = following.map((f) => f.following_id);

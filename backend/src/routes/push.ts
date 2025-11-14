@@ -48,7 +48,8 @@ router.post('/subscribe', authenticateUser, async (req: AuthRequest, res, next) 
       .single();
 
     if (existing) {
-      return res.json({ message: 'Already subscribed' });
+      res.json({ message: 'Already subscribed' });
+      return;
     }
 
     // Insert new subscription

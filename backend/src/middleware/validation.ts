@@ -59,7 +59,7 @@ export const isValidPassword = (password: string): boolean => {
 
 // Middleware to validate request body schema
 export const validateBody = (schema: { [key: string]: any }) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const errors: string[] = [];
 
     for (const [key, rules] of Object.entries(schema)) {
@@ -124,7 +124,7 @@ export const validateBody = (schema: { [key: string]: any }) => {
 
 // Middleware to validate query parameters
 export const validateQuery = (schema: { [key: string]: any }) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const errors: string[] = [];
 
     for (const [key, rules] of Object.entries(schema)) {
@@ -159,7 +159,7 @@ export const validateQuery = (schema: { [key: string]: any }) => {
 
 // Middleware to validate URL parameters
 export const validateParams = (schema: { [key: string]: any }) => {
-  return (req: Request, res: Response, next: NextFunction) => {
+  return (req: Request, _res: Response, next: NextFunction) => {
     const errors: string[] = [];
 
     for (const [key, rules] of Object.entries(schema)) {
@@ -184,7 +184,7 @@ export const validateParams = (schema: { [key: string]: any }) => {
 };
 
 // Sanitize all string inputs in request body
-export const sanitizeBody = (req: Request, res: Response, next: NextFunction) => {
+export const sanitizeBody = (req: Request, _res: Response, next: NextFunction) => {
   if (req.body && typeof req.body === 'object') {
     for (const key in req.body) {
       if (typeof req.body[key] === 'string') {
@@ -196,7 +196,7 @@ export const sanitizeBody = (req: Request, res: Response, next: NextFunction) =>
 };
 
 // Prevent SQL injection in query strings
-export const preventSQLInjection = (req: Request, res: Response, next: NextFunction) => {
+export const preventSQLInjection = (req: Request, _res: Response, next: NextFunction) => {
   const sqlInjectionPatterns = [
     /(\s|^)(union|select|insert|update|delete|drop|create|alter|exec|execute)(\s|$)/gi,
     /--/,
