@@ -2,6 +2,7 @@ import 'dotenv/config';
 import { Request, Response, NextFunction } from 'express';
 import { createClient } from '@supabase/supabase-js';
 import { AppError } from './errorHandler';
+import { logger } from '../services/logger';
 
 const supabase = createClient(
   process.env.SUPABASE_URL || '',
@@ -21,20 +22,26 @@ export const authenticateUser = async (
   next: NextFunction
 ) => {
   try {
+    logger.info(`Auth middleware: ${req.method} ${req.path}`);
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      logger.warn('Auth middleware: No authorization token provided');
       throw new AppError('No authorization token provided', 401);
     }
 
     const token = authHeader.substring(7);
+    logger.info('Auth middleware: Token found, verifying...');
 
     // Verify JWT token with Supabase
     const { data: { user }, error } = await supabase.auth.getUser(token);
 
     if (error || !user) {
+      logger.error('Auth middleware: Token validation failed', error);
       throw new AppError('Invalid or expired token', 401);
     }
+
+    logger.info(`Auth middleware: User authenticated - ${user.id}`);
 
     // Attach user to request
     req.user = {
@@ -44,6 +51,7 @@ export const authenticateUser = async (
 
     next();
   } catch (error) {
+    logger.error('Auth middleware error:', error);
     next(error);
   }
 };
