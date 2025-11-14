@@ -108,11 +108,11 @@ export function ProfilePage() {
       <Header />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-8 max-w-2xl">
+      <main className="container mx-auto px-4 py-4 sm:py-8 max-w-2xl">
         <Card>
           <CardHeader>
-            <CardTitle>My Profile</CardTitle>
-            <CardDescription>
+            <CardTitle className="text-xl sm:text-2xl">My Profile</CardTitle>
+            <CardDescription className="text-sm">
               {editing ? 'Update your profile information' : 'View your profile'}
             </CardDescription>
           </CardHeader>
@@ -131,18 +131,19 @@ export function ProfilePage() {
             {editing ? (
               <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="username">Username</Label>
+                  <Label htmlFor="username" className="text-sm sm:text-base">Username</Label>
                   <Input
                     id="username"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     disabled={loading}
                     required
+                    className="text-sm sm:text-base"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio" className="text-sm sm:text-base">Bio</Label>
                   <textarea
                     id="bio"
                     value={formData.bio}
@@ -158,7 +159,7 @@ export function ProfilePage() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="profile_picture_url">Profile Picture URL</Label>
+                  <Label htmlFor="profile_picture_url" className="text-sm sm:text-base">Profile Picture URL</Label>
                   <Input
                     id="profile_picture_url"
                     type="url"
@@ -168,30 +169,31 @@ export function ProfilePage() {
                     }
                     disabled={loading}
                     placeholder="https://example.com/avatar.jpg"
+                    className="text-sm sm:text-base"
                   />
                 </div>
 
-                <div className="flex space-x-2">
-                  <Button type="submit" disabled={loading}>
+                <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
+                  <Button type="submit" disabled={loading} className="w-full sm:w-auto">
                     {loading ? 'Saving...' : 'Save Changes'}
                   </Button>
-                  <Button type="button" variant="outline" onClick={handleCancel} disabled={loading}>
+                  <Button type="button" variant="outline" onClick={handleCancel} disabled={loading} className="w-full sm:w-auto">
                     Cancel
                   </Button>
                 </div>
               </form>
             ) : (
-              <div className="space-y-6">
-                <div className="flex items-center space-x-4">
+              <div className="space-y-4 sm:space-y-6">
+                <div className="flex flex-col sm:flex-row items-center sm:items-center space-y-4 sm:space-y-0 sm:space-x-4">
                   <img
                     src={profile.profile_picture_url || 'https://api.dicebear.com/7.x/avataaars/svg?seed=' + profile.id}
                     alt={profile.username}
-                    className="w-20 h-20 rounded-full border-2 border-primary"
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full border-2 border-primary flex-shrink-0"
                   />
-                  <div>
-                    <h3 className="text-2xl font-bold text-foreground">{profile.username}</h3>
-                    <p className="text-muted-foreground">{user.email}</p>
-                    <div className="flex space-x-4 mt-2 text-sm">
+                  <div className="text-center sm:text-left">
+                    <h3 className="text-xl sm:text-2xl font-bold text-foreground">{profile.username}</h3>
+                    <p className="text-sm sm:text-base text-muted-foreground break-all">{user.email}</p>
+                    <div className="flex justify-center sm:justify-start space-x-4 mt-2 text-sm">
                       <span className="text-foreground">
                         <strong>{followerCount}</strong> followers
                       </span>
@@ -204,25 +206,25 @@ export function ProfilePage() {
 
                 {profile.bio && (
                   <div>
-                    <h4 className="font-semibold text-foreground mb-2">Bio</h4>
-                    <p className="text-muted-foreground">{profile.bio}</p>
+                    <h4 className="font-semibold text-foreground mb-2 text-sm sm:text-base">Bio</h4>
+                    <p className="text-muted-foreground text-sm sm:text-base">{profile.bio}</p>
                   </div>
                 )}
 
-                <div className="text-sm text-muted-foreground">
+                <div className="text-xs sm:text-sm text-muted-foreground text-center sm:text-left">
                   Member since {new Date(profile.created_at).toLocaleDateString()}
                 </div>
 
-                <Button onClick={() => setEditing(true)}>Edit Profile</Button>
+                <Button onClick={() => setEditing(true)} className="w-full sm:w-auto">Edit Profile</Button>
               </div>
             )}
           </CardContent>
         </Card>
 
         {/* Placeholder for videos, playlists, etc. */}
-        <div className="mt-8 text-center p-8 rounded-lg bg-muted border border-border">
-          <h3 className="text-xl font-semibold text-foreground mb-2">Coming Soon</h3>
-          <p className="text-muted-foreground">
+        <div className="mt-6 sm:mt-8 text-center p-6 sm:p-8 rounded-lg bg-muted border border-border">
+          <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Coming Soon</h3>
+          <p className="text-sm sm:text-base text-muted-foreground">
             Your shared videos, playlists, and followers will appear here in future updates.
           </p>
         </div>

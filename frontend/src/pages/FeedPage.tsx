@@ -33,58 +33,58 @@ export function FeedPage() {
     <div className="min-h-screen bg-background">
       <Header />
 
-      <main className="container mx-auto px-4 py-8">
+      <main className="container mx-auto px-4 py-4 sm:py-8">
         <div className="max-w-4xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">Your Feed</h1>
-            <p className="text-muted-foreground">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">Your Feed</h1>
+            <p className="text-sm sm:text-base text-muted-foreground">
               Videos from users you follow
             </p>
           </div>
 
           {loading && (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">Loading your feed...</p>
+              <p className="text-sm sm:text-base text-muted-foreground">Loading your feed...</p>
             </div>
           )}
 
           {error && (
-            <div className="p-4 rounded-md bg-destructive/15 text-destructive mb-6">
+            <div className="p-4 rounded-md bg-destructive/15 text-destructive mb-6 text-sm sm:text-base">
               {error}
             </div>
           )}
 
           {!loading && !error && videos.length === 0 && (
             <div className="text-center py-12">
-              <div className="text-6xl mb-4">📭</div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">
+              <div className="text-4xl sm:text-6xl mb-4">📭</div>
+              <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
                 Your feed is empty
               </h3>
-              <p className="text-muted-foreground mb-6">
+              <p className="text-sm sm:text-base text-muted-foreground mb-6 px-4">
                 Follow other users to see their shared videos here!
               </p>
               <Link to="/search">
-                <Button>Discover Videos</Button>
+                <Button className="text-sm sm:text-base">Discover Videos</Button>
               </Link>
             </div>
           )}
 
           {!loading && videos.length > 0 && (
-            <div className="space-y-6">
+            <div className="space-y-4 sm:space-y-6">
               {videos.map((video) => (
                 <Card key={video.id} className="overflow-hidden">
-                  <div className="md:flex">
-                    <div className="md:w-1/3">
+                  <div className="flex flex-col md:flex-row">
+                    <div className="w-full md:w-1/3">
                       <img
                         src={video.thumbnail_url || 'https://via.placeholder.com/320x180'}
                         alt={video.title}
                         className="w-full h-48 md:h-full object-cover"
                       />
                     </div>
-                    <div className="md:w-2/3">
-                      <CardHeader>
-                        <CardTitle className="text-lg">{video.title}</CardTitle>
-                        <CardDescription>
+                    <div className="w-full md:w-2/3">
+                      <CardHeader className="p-4 sm:p-6">
+                        <CardTitle className="text-base sm:text-lg">{video.title}</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">
                           Shared by{' '}
                           <Link
                             to={`/user/${video.user_id}`}
@@ -96,22 +96,23 @@ export function FeedPage() {
                           {new Date(video.created_at).toLocaleDateString()}
                         </CardDescription>
                       </CardHeader>
-                      <CardContent>
+                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
                         {video.description && (
-                          <p className="text-sm text-muted-foreground line-clamp-2 mb-4">
+                          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3 sm:mb-4">
                             {video.description}
                           </p>
                         )}
-                        <div className="flex space-x-2">
+                        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
                           <a
                             href={`https://www.youtube.com/watch?v=${video.youtube_video_id}`}
                             target="_blank"
                             rel="noopener noreferrer"
+                            className="flex-1 sm:flex-none"
                           >
-                            <Button size="sm">Watch on YouTube</Button>
+                            <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">Watch on YouTube</Button>
                           </a>
-                          <Link to={`/video/${video.id}`}>
-                            <Button size="sm" variant="outline">
+                          <Link to={`/video/${video.id}`} className="flex-1 sm:flex-none">
+                            <Button size="sm" variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">
                               View Comments
                             </Button>
                           </Link>
