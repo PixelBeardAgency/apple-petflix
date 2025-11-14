@@ -8,6 +8,9 @@ export interface User {
   updated_at: string;
 }
 
+// Profile is an alias for User (used in some contexts)
+export type Profile = User;
+
 export interface Video {
   id: string;
   youtube_video_id: string;
@@ -42,6 +45,7 @@ export interface Playlist {
   updated_at: string;
   user?: User;
   videos?: Video[];
+  video_count?: number;
 }
 
 export interface Follower {

@@ -10,7 +10,7 @@ import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Header } from '../components/Header';
-import { VideoCard } from '../components/VideoCard';
+import { SharedVideoCard } from '../components/SharedVideoCard';
 import { EmptyState } from '../components/EmptyState';
 import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
 import type { Video, Playlist, Profile } from '../types';
@@ -324,7 +324,7 @@ export function ProfilePage() {
               ) : videos.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {videos.map((video) => (
-                    <VideoCard key={video.id} video={video} />
+                    <SharedVideoCard key={video.id} video={video} />
                   ))}
                 </div>
               ) : (
@@ -332,8 +332,10 @@ export function ProfilePage() {
                   icon={VideoIcon}
                   title="No videos yet"
                   description="Share some videos to see them here!"
-                  actionLabel="Search Videos"
-                  onAction={() => navigate('/search')}
+                  action={{
+                    label: "Search Videos",
+                    onClick: () => navigate('/search')
+                  }}
                 />
               )}
             </TabsContent>
@@ -369,8 +371,10 @@ export function ProfilePage() {
                   icon={List}
                   title="No playlists yet"
                   description="Create playlists to organize your videos!"
-                  actionLabel="View Playlists"
-                  onAction={() => navigate('/playlists')}
+                  action={{
+                    label: "View Playlists",
+                    onClick: () => navigate('/playlists')
+                  }}
                 />
               )}
             </TabsContent>
@@ -449,8 +453,10 @@ export function ProfilePage() {
                   icon={UserPlus}
                   title="Not following anyone yet"
                   description="Follow users to see their content in your feed!"
-                  actionLabel="Discover Users"
-                  onAction={() => navigate('/search')}
+                  action={{
+                    label: "Discover Users",
+                    onClick: () => navigate('/search')
+                  }}
                 />
               )}
             </TabsContent>
