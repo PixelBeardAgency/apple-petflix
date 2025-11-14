@@ -16,7 +16,7 @@ process.env.VAPID_SUBJECT = 'mailto:test@example.com';
 jest.setTimeout(10000);
 
 // Mock console methods to reduce noise in tests
-global.console = {
+const consoleMock = {
   ...console,
   log: jest.fn(),
   debug: jest.fn(),
@@ -24,4 +24,6 @@ global.console = {
   warn: jest.fn(),
   // Keep error for debugging
 };
+
+global.console = consoleMock as Console;
 

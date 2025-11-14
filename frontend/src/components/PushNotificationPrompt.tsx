@@ -4,6 +4,7 @@ import { Button } from './ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 import { pushService } from '../services/push';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 
 export function PushNotificationPrompt() {
   const { user } = useAuth();
@@ -64,7 +65,12 @@ export function PushNotificationPrompt() {
 
     try {
       // Get user token (from Supabase session)
-      const { data } = await (window as any).supabase.auth.getSession();
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      
+      if (sessionError) {
+        throw sessionError;
+      }
+      
       const token = data?.session?.access_token;
 
       if (!token) {

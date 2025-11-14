@@ -14,22 +14,22 @@
       "use": "@vercel/node"
     }
   ],
-  "routes": [
+  "rewrites": [
     {
-      "src": "/api/(.*)",
-      "dest": "backend/src/server.ts"
+      "source": "/api/(.*)",
+      "destination": "/backend/api"
     },
     {
-      "src": "/health",
-      "dest": "backend/src/server.ts"
+      "source": "/health",
+      "destination": "/backend/api"
     },
     {
-      "src": "/metrics",
-      "dest": "backend/src/server.ts"
+      "source": "/metrics",
+      "destination": "/backend/api"
     },
     {
-      "src": "/(.*)",
-      "dest": "frontend/dist/$1"
+      "source": "/(.*)",
+      "destination": "/frontend/$1"
     }
   ],
   "env": {
@@ -101,12 +101,6 @@
           "value": "public, max-age=3600"
         }
       ]
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/((?!api).*)",
-      "destination": "/index.html"
     }
   ]
 }

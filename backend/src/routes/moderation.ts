@@ -99,7 +99,7 @@ router.put('/reports/:reportId', authenticateUser, async (req: AuthRequest, res,
  * GET /api/moderation/stats
  * Get moderation statistics
  */
-router.get('/stats', authenticateUser, async (req: AuthRequest, res, next) => {
+router.get('/stats', authenticateUser, async (_req: AuthRequest, res, next) => {
   try {
     // Get pending reports count
     const { count: pendingCount } = await supabase
