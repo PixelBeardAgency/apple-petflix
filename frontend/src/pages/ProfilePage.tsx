@@ -2,11 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { followService } from '../services/follow';
+import { videoService } from '../services/video';
+import { playlistService } from '../services/playlist';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/tabs';
 import { Header } from '../components/Header';
+import { VideoCard } from '../components/VideoCard';
+import { EmptyState } from '../components/EmptyState';
+import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
+import type { Video, Playlist, Profile } from '../types';
+import { Video as VideoIcon, List, Users, UserPlus } from 'lucide-react';
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -22,6 +30,16 @@ export function ProfilePage() {
     bio: profile?.bio || '',
     profile_picture_url: profile?.profile_picture_url || '',
   });
+
+  // Tab content state
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [followers, setFollowers] = useState<Profile[]>([]);
+  const [following, setFollowing] = useState<Profile[]>([]);
+  const [loadingVideos, setLoadingVideos] = useState(false);
+  const [loadingPlaylists, setLoadingPlaylists] = useState(false);
+  const [loadingFollowers, setLoadingFollowers] = useState(false);
+  const [loadingFollowing, setLoadingFollowing] = useState(false);
 
   useEffect(() => {
     if (profile?.id) {
@@ -41,6 +59,58 @@ export function ProfilePage() {
       setFollowingCount(following.total);
     } catch (error) {
       console.error('Failed to load follow counts:', error);
+    }
+  };
+
+  const loadVideos = async () => {
+    if (!profile?.id || loadingVideos) return;
+    setLoadingVideos(true);
+    try {
+      const result = await videoService.getUserVideos(profile.id);
+      setVideos(result);
+    } catch (error) {
+      console.error('Failed to load videos:', error);
+    } finally {
+      setLoadingVideos(false);
+    }
+  };
+
+  const loadPlaylists = async () => {
+    if (!profile?.id || loadingPlaylists) return;
+    setLoadingPlaylists(true);
+    try {
+      const result = await playlistService.getPlaylists(20, 0);
+      setPlaylists(result.playlists);
+    } catch (error) {
+      console.error('Failed to load playlists:', error);
+    } finally {
+      setLoadingPlaylists(false);
+    }
+  };
+
+  const loadFollowers = async () => {
+    if (!profile?.id || loadingFollowers) return;
+    setLoadingFollowers(true);
+    try {
+      const result = await followService.getFollowers(profile.id, 20, 0);
+      setFollowers(result.followers);
+    } catch (error) {
+      console.error('Failed to load followers:', error);
+    } finally {
+      setLoadingFollowers(false);
+    }
+  };
+
+  const loadFollowing = async () => {
+    if (!profile?.id || loadingFollowing) return;
+    setLoadingFollowing(true);
+    try {
+      const result = await followService.getFollowing(profile.id, 20, 0);
+      setFollowing(result.following);
+    } catch (error) {
+      console.error('Failed to load following:', error);
+    } finally {
+      setLoadingFollowing(false);
     }
   };
 
@@ -222,11 +292,169 @@ export function ProfilePage() {
         </Card>
 
         {/* Placeholder for videos, playlists, etc. */}
-        <div className="mt-6 sm:mt-8 text-center p-6 sm:p-8 rounded-lg bg-muted border border-border">
-          <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">Coming Soon</h3>
-          <p className="text-sm sm:text-base text-muted-foreground">
-            Your shared videos, playlists, and followers will appear here in future updates.
-          </p>
+        <div className="mt-6 sm:mt-8">
+          <Tabs defaultValue="videos" className="w-full">
+            <TabsList className="grid w-full grid-cols-4">
+              <TabsTrigger value="videos" onClick={loadVideos}>
+                <VideoIcon className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Videos</span>
+              </TabsTrigger>
+              <TabsTrigger value="playlists" onClick={loadPlaylists}>
+                <List className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Playlists</span>
+              </TabsTrigger>
+              <TabsTrigger value="followers" onClick={loadFollowers}>
+                <Users className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Followers</span>
+              </TabsTrigger>
+              <TabsTrigger value="following" onClick={loadFollowing}>
+                <UserPlus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">Following</span>
+              </TabsTrigger>
+            </TabsList>
+
+            {/* Videos Tab */}
+            <TabsContent value="videos" className="mt-6">
+              {loadingVideos ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[...Array(3)].map((_, i) => (
+                    <VideoCardSkeleton key={i} />
+                  ))}
+                </div>
+              ) : videos.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {videos.map((video) => (
+                    <VideoCard key={video.id} video={video} />
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={VideoIcon}
+                  title="No videos yet"
+                  description="Share some videos to see them here!"
+                  actionLabel="Search Videos"
+                  onAction={() => navigate('/search')}
+                />
+              )}
+            </TabsContent>
+
+            {/* Playlists Tab */}
+            <TabsContent value="playlists" className="mt-6">
+              {loadingPlaylists ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-24 bg-muted animate-pulse rounded-lg" />
+                  ))}
+                </div>
+              ) : playlists.length > 0 ? (
+                <div className="space-y-4">
+                  {playlists.map((playlist) => (
+                    <Link
+                      key={playlist.id}
+                      to={`/playlists/${playlist.id}`}
+                      className="block p-4 rounded-lg border border-border hover:border-primary transition-colors"
+                    >
+                      <h3 className="font-semibold text-lg text-foreground">{playlist.name}</h3>
+                      {playlist.description && (
+                        <p className="text-sm text-muted-foreground mt-1">{playlist.description}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground mt-2">
+                        {playlist.video_count || 0} videos
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={List}
+                  title="No playlists yet"
+                  description="Create playlists to organize your videos!"
+                  actionLabel="View Playlists"
+                  onAction={() => navigate('/playlists')}
+                />
+              )}
+            </TabsContent>
+
+            {/* Followers Tab */}
+            <TabsContent value="followers" className="mt-6">
+              {loadingFollowers ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-16 bg-muted animate-pulse rounded-lg" />
+                  ))}
+                </div>
+              ) : followers.length > 0 ? (
+                <div className="space-y-4">
+                  {followers.map((follower) => (
+                    <Link
+                      key={follower.id}
+                      to={`/profile/${follower.id}`}
+                      className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:border-primary transition-colors"
+                    >
+                      <img
+                        src={follower.profile_picture_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${follower.id}`}
+                        alt={follower.username}
+                        className="w-12 h-12 rounded-full"
+                      />
+                      <div>
+                        <h4 className="font-semibold text-foreground">{follower.username}</h4>
+                        {follower.bio && (
+                          <p className="text-sm text-muted-foreground line-clamp-1">{follower.bio}</p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={Users}
+                  title="No followers yet"
+                  description="Share great content to gain followers!"
+                />
+              )}
+            </TabsContent>
+
+            {/* Following Tab */}
+            <TabsContent value="following" className="mt-6">
+              {loadingFollowing ? (
+                <div className="space-y-4">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-16 bg-muted animate-pulse rounded-lg" />
+                  ))}
+                </div>
+              ) : following.length > 0 ? (
+                <div className="space-y-4">
+                  {following.map((user) => (
+                    <Link
+                      key={user.id}
+                      to={`/profile/${user.id}`}
+                      className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:border-primary transition-colors"
+                    >
+                      <img
+                        src={user.profile_picture_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
+                        alt={user.username}
+                        className="w-12 h-12 rounded-full"
+                      />
+                      <div>
+                        <h4 className="font-semibold text-foreground">{user.username}</h4>
+                        {user.bio && (
+                          <p className="text-sm text-muted-foreground line-clamp-1">{user.bio}</p>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <EmptyState
+                  icon={UserPlus}
+                  title="Not following anyone yet"
+                  description="Follow users to see their content in your feed!"
+                  actionLabel="Discover Users"
+                  onAction={() => navigate('/search')}
+                />
+              )}
+            </TabsContent>
+          </Tabs>
         </div>
       </main>
     </div>

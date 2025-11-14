@@ -120,6 +120,41 @@ router.get('/:videoId', optionalAuth, async (req, res, next) => {
 });
 
 /**
+ * GET /api/videos/user/:userId
+ * Get all videos shared by a specific user
+ */
+router.get('/user/:userId', async (req, res, next) => {
+  try {
+    const { userId } = req.params;
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    const { data: videos, error, count } = await supabase
+      .from('videos')
+      .select(`
+        *,
+        user:profiles(id, username, profile_picture_url)
+      `, { count: 'exact' })
+      .eq('user_id', userId)
+      .order('created_at', { ascending: false })
+      .range(offset, offset + limit - 1);
+
+    if (error) {
+      throw new AppError(error.message, 500);
+    }
+
+    res.json({
+      videos: videos || [],
+      total: count || 0,
+      limit,
+      offset,
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
  * PUT /api/videos/:videoId
  * Update video (title, description)
  */

@@ -52,6 +52,23 @@ export class VideoService {
   }
 
   /**
+   * Get all videos shared by a specific user
+   */
+  async getUserVideos(userId: string, limit: number = 20, offset: number = 0): Promise<Video[]> {
+    const response = await fetch(
+      `${API_URL}/api/videos/user/${userId}?limit=${limit}&offset=${offset}`
+    );
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.error?.message || 'Failed to get user videos');
+    }
+
+    const data = await response.json();
+    return data.videos;
+  }
+
+  /**
    * Update video
    */
   async updateVideo(videoId: string, title: string, description: string): Promise<Video> {
