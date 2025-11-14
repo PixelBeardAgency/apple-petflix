@@ -128,17 +128,7 @@ self.addEventListener('push', (event: PushEvent) => {
       timestamp: Date.now(),
     },
     requireInteraction: false,
-    actions: [
-      {
-        action: 'view',
-        title: 'View',
-      },
-      {
-        action: 'dismiss',
-        title: 'Dismiss',
-      },
-    ],
-  };
+  } as NotificationOptions;
 
   event.waitUntil(
     self.registration.showNotification(title || 'Petflix', options)
