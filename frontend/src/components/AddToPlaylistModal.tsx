@@ -75,11 +75,11 @@ export function AddToPlaylistModal({ videoId, onClose }: AddToPlaylistModalProps
 
     try {
       // Create the new playlist
-      const newPlaylist = await playlistService.createPlaylist({
-        name: newPlaylistName.trim(),
-        description: '',
-        is_public: true,
-      });
+      const newPlaylist = await playlistService.createPlaylist(
+        newPlaylistName.trim(),
+        '',
+        true
+      );
 
       // Add the video to the newly created playlist
       await playlistService.addVideo(newPlaylist.id, videoId);
