@@ -87,8 +87,8 @@ export function VideoDetailPage() {
               {/* Video Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-2xl">{video.title}</CardTitle>
-                  <div className="flex items-center justify-between mt-4">
+                  <CardTitle className="text-xl sm:text-2xl">{video.title}</CardTitle>
+                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
                     <div className="flex items-center space-x-3">
                       <img
                         src={
@@ -96,7 +96,7 @@ export function VideoDetailPage() {
                           `https://api.dicebear.com/7.x/avataaars/svg?seed=${video.user_id}`
                         }
                         alt={(video as any).user?.username || 'User'}
-                        className="w-10 h-10 rounded-full"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-full flex-shrink-0"
                       />
                       <div>
                         <p className="font-semibold text-foreground">

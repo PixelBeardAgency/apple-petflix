@@ -57,11 +57,11 @@ export function SearchPage() {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-4xl mx-auto">
           {/* Search Header */}
-          <div className="mb-8">
-            <h1 className="text-4xl font-bold text-foreground mb-2">
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2">
               Search Pet Videos
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               Find adorable pet videos from YouTube
             </p>
           </div>
@@ -70,16 +70,16 @@ export function SearchPage() {
           <div className="mb-6 space-y-4">
             <Input
               type="text"
-              placeholder="Search for pet videos... (e.g., 'funny cats', 'puppy training')"
+              placeholder="Search for pet videos..."
               value={query}
               onChange={(e) => setQuery(e.target.value)}
-              className="text-lg py-6"
+              className="text-base sm:text-lg py-4 sm:py-6"
             />
 
             {/* Sort Options */}
-            <div className="flex items-center space-x-2">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-2">
               <span className="text-sm text-muted-foreground">Sort by:</span>
-              <div className="flex space-x-2">
+              <div className="flex flex-wrap gap-2">
                 {[
                   { value: 'relevance', label: 'Relevance' },
                   { value: 'date', label: 'Recent' },
@@ -91,6 +91,7 @@ export function SearchPage() {
                     variant={sortOrder === option.value ? 'default' : 'outline'}
                     size="sm"
                     onClick={() => setSortOrder(option.value as any)}
+                    className="flex-1 sm:flex-none"
                   >
                     {option.label}
                   </Button>
@@ -132,7 +133,7 @@ export function SearchPage() {
               <div className="mb-4 text-sm text-muted-foreground">
                 Found {videos.length} videos for "{query}"
               </div>
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {videos.map((video) => (
                   <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow">
                     <div className="relative aspect-video">
