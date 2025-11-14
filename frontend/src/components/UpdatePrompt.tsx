@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 import { Button } from './ui/button';
 import { RefreshCw } from 'lucide-react';
@@ -8,10 +8,10 @@ export function UpdatePrompt() {
     needRefresh: [needRefresh, setNeedRefresh],
     updateServiceWorker,
   } = useRegisterSW({
-    onRegistered(registration) {
+    onRegistered(registration: ServiceWorkerRegistration | undefined) {
       console.log('SW Registered:', registration);
     },
-    onRegisterError(error) {
+    onRegisterError(error: Error) {
       console.log('SW registration error', error);
     },
   });

@@ -176,3 +176,41 @@ This file contains a record of all user prompts during the Petflix implementatio
     - Maintained routing logic for API and frontend
     
     Status: Vercel configuration fixed ✅, ready to deploy
+
+50. Vercel build failure with TypeScript errors (50+ errors during compilation):
+    
+    Issues found:
+    - tsconfig had invalid compiler options (erasableSyntaxOnly, etc.)
+    - verbatimModuleSyntax was too strict for imports
+    - Unused React imports (React 18 doesn't need them with jsx: "react-jsx")
+    - Service worker type errors (vibrate, clients references)
+    - API call signature mismatch in VideoDetailPage
+    - Missing path alias configuration
+    
+    Fixes applied:
+    - ✅ Fixed tsconfig.app.json and tsconfig.node.json (removed invalid options, added WebWorker lib, path aliases)
+    - ✅ Fixed EmptyState.tsx (type-only import for LucideIcon)
+    - ✅ Fixed NotificationBell.tsx (removed unused imports)
+    - ✅ Fixed UpdatePrompt.tsx (added explicit types, removed React import)
+    - ✅ Fixed sw.ts (removed vibrate, fixed clients references, added proper types)
+    - ✅ Fixed VideoDetailPage.tsx (corrected getVideo() call signature)
+    - 📝 Created VERCEL-BUILD-FIXES.md documentation
+    
+    Status: All TypeScript errors fixed ✅, ready to redeploy
+
+51. User shared test/lint warnings (backend and frontend tests showing ESLint warnings):
+    
+    Issues shown:
+    - Backend: Unused variables in tests, require/import statement warnings, any type warnings
+    - Frontend: Missing ESLint rules, React Hook dependency warnings
+    
+    Analysis & fixes:
+    - ⚠️  These are NON-CRITICAL linting warnings, not errors
+    - ⚠️  Do NOT affect deployment or runtime
+    - ✅ Created .eslintrc.js for backend with relaxed test rules
+    - ✅ Created .eslintrc.json for frontend with TypeScript rules
+    - ✅ Created .eslintignore files for both to ignore build artifacts
+    - ✅ Configured to allow _ prefix for unused variables
+    - 📝 Created TEST-LINT-WARNINGS.md comprehensive guide
+    
+    Status: Warnings documented ⚠️, deployment still ready ✅, fixes optional

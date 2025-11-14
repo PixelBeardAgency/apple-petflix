@@ -127,7 +127,6 @@ self.addEventListener('push', (event: PushEvent) => {
       url: url || '/',
       timestamp: Date.now(),
     },
-    vibrate: [200, 100, 200],
     requireInteraction: false,
     actions: [
       {
@@ -164,9 +163,9 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
 
   // Open the URL (view action or click on notification body)
   event.waitUntil(
-    clients
+    self.clients
       .matchAll({ type: 'window', includeUncontrolled: true })
-      .then((clientList) => {
+      .then((clientList: readonly WindowClient[]) => {
         // Check if there's already a window open
         for (const client of clientList) {
           if (client.url.includes(urlToOpen) && 'focus' in client) {
@@ -175,8 +174,8 @@ self.addEventListener('notificationclick', (event: NotificationEvent) => {
         }
 
         // Open a new window
-        if (clients.openWindow) {
-          return clients.openWindow(urlToOpen);
+        if (self.clients.openWindow) {
+          return self.clients.openWindow(urlToOpen);
         }
       })
   );

@@ -1,0 +1,28 @@
+# Test coverage
+coverage/
+*.coverage
+
+# Test results
+test-results/
+junit.xml
+
+# Build artifacts
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment
+.env.test
+.env.local
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+

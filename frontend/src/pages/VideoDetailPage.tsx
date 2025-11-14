@@ -32,8 +32,7 @@ export function VideoDetailPage() {
     setError(null);
 
     try {
-      const token = user ? (await (await fetch('/api/auth/session')).json()).access_token : null;
-      const result = await videoService.getVideo(token || '', videoId);
+      const result = await videoService.getVideo(videoId);
       setVideo(result);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load video');
