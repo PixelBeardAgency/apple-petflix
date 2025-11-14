@@ -44,6 +44,8 @@ export function ProfilePage() {
   useEffect(() => {
     if (profile?.id) {
       loadFollowCounts();
+      // Load the default tab (Videos) on mount
+      loadVideos();
     }
   }, [profile?.id]);
 
@@ -63,7 +65,7 @@ export function ProfilePage() {
   };
 
   const loadVideos = async () => {
-    if (!profile?.id || loadingVideos) return;
+    if (!profile?.id || loadingVideos || videos.length > 0) return;
     setLoadingVideos(true);
     try {
       const result = await videoService.getUserVideos(profile.id);
@@ -76,7 +78,7 @@ export function ProfilePage() {
   };
 
   const loadPlaylists = async () => {
-    if (!profile?.id || loadingPlaylists) return;
+    if (!profile?.id || loadingPlaylists || playlists.length > 0) return;
     setLoadingPlaylists(true);
     try {
       const result = await playlistService.getPlaylists(20, 0);
@@ -89,7 +91,7 @@ export function ProfilePage() {
   };
 
   const loadFollowers = async () => {
-    if (!profile?.id || loadingFollowers) return;
+    if (!profile?.id || loadingFollowers || followers.length > 0) return;
     setLoadingFollowers(true);
     try {
       const result = await followService.getFollowers(profile.id, 20, 0);
@@ -102,7 +104,7 @@ export function ProfilePage() {
   };
 
   const loadFollowing = async () => {
-    if (!profile?.id || loadingFollowing) return;
+    if (!profile?.id || loadingFollowing || following.length > 0) return;
     setLoadingFollowing(true);
     try {
       const result = await followService.getFollowing(profile.id, 20, 0);
