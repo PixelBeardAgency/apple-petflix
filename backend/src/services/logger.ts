@@ -14,8 +14,8 @@ const logFormat = winston.format.combine(
   winston.format.json()
 );
 
-const transports = [
-  // Console transport
+const transports: winston.transport[] = [
+  // Console transport (always available)
   new winston.transports.Console({
     format: winston.format.combine(
       winston.format.colorize(),
@@ -28,20 +28,26 @@ const transports = [
       })
     ),
   }),
-  // File transport for errors
-  new winston.transports.File({
-    filename: 'logs/error.log',
-    level: 'error',
-    maxsize: 5242880, // 5MB
-    maxFiles: 5,
-  }),
-  // File transport for all logs
-  new winston.transports.File({
-    filename: 'logs/combined.log',
-    maxsize: 5242880, // 5MB
-    maxFiles: 5,
-  }),
 ];
+
+// Only add file transports in development (not on Vercel/serverless)
+if (process.env.NODE_ENV !== 'production' && !process.env.VERCEL) {
+  transports.push(
+    // File transport for errors
+    new winston.transports.File({
+      filename: 'logs/error.log',
+      level: 'error',
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    }),
+    // File transport for all logs
+    new winston.transports.File({
+      filename: 'logs/combined.log',
+      maxsize: 5242880, // 5MB
+      maxFiles: 5,
+    })
+  );
+}
 
 export const logger = winston.createLogger({
   level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
