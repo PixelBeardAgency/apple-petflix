@@ -25,13 +25,28 @@ export class FeedService {
       {
         headers: {
           'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
         },
       }
     );
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Failed to get feed');
+      let errorMessage = 'Failed to get feed';
+      try {
+        const contentType = response.headers.get('content-type');
+        if (contentType && contentType.includes('application/json')) {
+          const error = await response.json();
+          errorMessage = error.error?.message || error.message || errorMessage;
+        } else {
+          // Non-JSON response (likely HTML error page)
+          const text = await response.text();
+          console.error('Feed API error (non-JSON):', text.substring(0, 200));
+          errorMessage = `Server error: ${response.status} ${response.statusText}`;
+        }
+      } catch (parseError) {
+        console.error('Failed to parse feed error response:', parseError);
+      }
+      throw new Error(errorMessage);
     }
 
     return response.json();
