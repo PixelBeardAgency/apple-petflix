@@ -241,3 +241,13 @@ This file contains a record of all user prompts during the Petflix implementatio
     - 📝 Created VERCEL-OUTPUT-FIX.md documentation
     
     Status: Output directory configured ✅, ready to redeploy
+
+54. Vercel deployment error: "Function Runtimes must have a valid version, for example `now-php@1.0.0`"
+    
+    Issue: Invalid functions configuration with incorrect runtime syntax
+    
+    Fix applied:
+    - ✅ Removed functions configuration block (not needed, Vercel auto-detects Node.js)
+    - Note: /api/index.js will automatically run as Node.js serverless function
+    
+    Status: Functions config removed ✅, Vercel will auto-detect runtime
