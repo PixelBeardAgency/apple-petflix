@@ -3,7 +3,8 @@
  * Handles web push notification subscriptions and management
  */
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001';
+import { API_URL } from '../config/api';
+
 const VAPID_PUBLIC_KEY = import.meta.env.VITE_VAPID_PUBLIC_KEY || '';
 
 export type PushSubscriptionData = {
