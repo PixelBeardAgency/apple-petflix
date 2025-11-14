@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response, NextFunction } from 'express';
 import { authenticateUser, AuthRequest } from '../auth';
 
 // Mock Supabase

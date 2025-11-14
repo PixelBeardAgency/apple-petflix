@@ -7,8 +7,6 @@ import {
   isValidUsername,
   isValidPassword,
   validateBody,
-  validateQuery,
-  validateParams,
   sanitizeBody,
   preventSQLInjection,
 } from '../validation';

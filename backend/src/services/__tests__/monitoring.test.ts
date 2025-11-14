@@ -185,7 +185,7 @@ describe('Monitoring Service', () => {
         method: 'GET',
       };
       
-      endSpy = jest.fn(function (this: any, ...args: any[]) {
+      endSpy = jest.fn(function (this: any, ..._args: any[]) {
         return this;
       });
 

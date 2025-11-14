@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import { notificationService } from '../services/notification';
 import { Button } from './ui/button';
 import {
-  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,

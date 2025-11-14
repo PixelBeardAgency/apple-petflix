@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Search, Share2, Home, User, Bell, LogOut, List, Shield } from 'lucide-react';
+import { Menu, X, Search, Share2, Home, User, Bell, LogOut, List } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
 import { ThemeToggle } from './ThemeToggle';
