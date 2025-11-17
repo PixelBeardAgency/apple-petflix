@@ -40,7 +40,8 @@ export function NotificationsPage() {
 
     try {
       const data = await notificationService.getNotifications(50, 0);
-      setNotifications(data);
+      // Backend returns { notifications: [...], total, limit, offset }
+      setNotifications(data.notifications || []);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load notifications');
     } finally {
