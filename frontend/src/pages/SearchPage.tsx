@@ -12,7 +12,7 @@ import { Header } from '../components/Header';
 import { VideoPreviewModal } from '../components/VideoPreviewModal';
 import { EmptyState } from '../components/EmptyState';
 import { debounce } from '../lib/utils';
-import { Search, Users } from 'lucide-react';
+import { Search, Users, Play } from 'lucide-react';
 
 export function SearchPage() {
   const { user } = useAuth();
@@ -226,7 +226,7 @@ export function SearchPage() {
                           {/* Play overlay */}
                           <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                             <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-                              <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-charcoal border-b-8 border-b-transparent ml-1"></div>
+                              <Play className="w-6 h-6 text-gray-900 fill-gray-900" />
                             </div>
                           </div>
                         </div>

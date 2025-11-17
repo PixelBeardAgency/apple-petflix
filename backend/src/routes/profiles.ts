@@ -17,9 +17,9 @@ const supabase = createClient(
  */
 router.get('/search', authenticateUser, async (req: AuthRequest, res, next) => {
   try {
-    const { query } = req.query;
+    const { q } = req.query;
 
-    if (!query || typeof query !== 'string') {
+    if (!q || typeof q !== 'string') {
       throw new AppError('Query parameter is required', 400);
     }
 
@@ -27,7 +27,7 @@ router.get('/search', authenticateUser, async (req: AuthRequest, res, next) => {
     const { data, error } = await supabase
       .from('profiles')
       .select('id, username, bio, profile_picture_url')
-      .ilike('username', `%${query}%`)
+      .ilike('username', `%${q}%`)
       .limit(20);
 
     if (error) {
