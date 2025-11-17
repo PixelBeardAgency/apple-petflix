@@ -15,6 +15,8 @@ interface Playlist {
   description: string | null;
   is_public: boolean;
   created_at: string;
+  video_count?: number;
+  thumbnail_url?: string | null;
 }
 
 export function PlaylistsPage() {
@@ -202,7 +204,29 @@ export function PlaylistsPage() {
           {!loading && playlists.length > 0 && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {playlists.map((playlist) => (
-                <Card key={playlist.id}>
+                <Card key={playlist.id} className="overflow-hidden">
+                  {/* Thumbnail */}
+                  {playlist.thumbnail_url ? (
+                    <div className="aspect-video w-full bg-muted relative">
+                      <img
+                        src={playlist.thumbnail_url}
+                        alt={playlist.name}
+                        className="w-full h-full object-cover"
+                      />
+                      {/* Video count overlay */}
+                      <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                        {playlist.video_count || 0} {playlist.video_count === 1 ? 'video' : 'videos'}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="aspect-video w-full bg-muted flex items-center justify-center">
+                      <div className="text-center text-muted-foreground">
+                        <div className="text-4xl mb-2">📝</div>
+                        <p className="text-sm">No videos yet</p>
+                      </div>
+                    </div>
+                  )}
+                  
                   <CardHeader>
                     <div className="flex items-start justify-between">
                       <div className="flex-1">

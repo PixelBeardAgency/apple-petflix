@@ -480,20 +480,44 @@ export function ProfilePage() {
                   ))}
                 </div>
               ) : playlists.length > 0 ? (
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {playlists.map((playlist) => (
                     <Link
                       key={playlist.id}
                       to={`/playlists/${playlist.id}`}
-                      className="block p-4 rounded-lg border border-border hover:border-primary transition-colors"
+                      className="block rounded-lg border border-border hover:border-primary transition-colors overflow-hidden"
                     >
-                      <h3 className="font-semibold text-lg text-foreground">{playlist.name}</h3>
-                      {playlist.description && (
-                        <p className="text-sm text-muted-foreground mt-1">{playlist.description}</p>
+                      {/* Thumbnail */}
+                      {playlist.thumbnail_url ? (
+                        <div className="aspect-video w-full bg-muted relative">
+                          <img
+                            src={playlist.thumbnail_url}
+                            alt={playlist.name}
+                            className="w-full h-full object-cover"
+                          />
+                          {/* Video count overlay */}
+                          <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded text-xs">
+                            {playlist.video_count || 0} {playlist.video_count === 1 ? 'video' : 'videos'}
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="aspect-video w-full bg-muted flex items-center justify-center">
+                          <div className="text-center text-muted-foreground">
+                            <div className="text-3xl mb-1">📝</div>
+                            <p className="text-xs">No videos yet</p>
+                          </div>
+                        </div>
                       )}
-                      <p className="text-xs text-muted-foreground mt-2">
-                        {playlist.video_count || 0} videos
-                      </p>
+                      
+                      <div className="p-4">
+                        <h3 className="font-semibold text-base text-foreground line-clamp-1">{playlist.name}</h3>
+                        {playlist.description && (
+                          <p className="text-sm text-muted-foreground mt-1 line-clamp-2">{playlist.description}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground mt-2">
+                          {playlist.is_public ? '🌐 Public' : '🔒 Private'}
+                        </p>
+                      </div>
                     </Link>
                   ))}
                 </div>

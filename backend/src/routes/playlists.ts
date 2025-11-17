@@ -20,7 +20,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 
 /**
  * GET /api/playlists
- * Get user's playlists
+ * Get user's playlists with thumbnail from first video
  */
 router.get('/', authenticateUser, async (req: AuthRequest, res, next) => {
   try {
@@ -38,14 +38,28 @@ router.get('/', authenticateUser, async (req: AuthRequest, res, next) => {
       throw new AppError(error.message, 500);
     }
 
-    // Ensure video_count is never null
-    const playlistsWithCount = (data || []).map(playlist => ({
-      ...playlist,
-      video_count: playlist.video_count ?? 0,
-    }));
+    // For each playlist, get the first video's thumbnail
+    const playlistsWithThumbnails = await Promise.all(
+      (data || []).map(async (playlist) => {
+        // Get first video thumbnail
+        const { data: firstVideo } = await supabase
+          .from('playlist_videos')
+          .select('video:videos(thumbnail_url)')
+          .eq('playlist_id', playlist.id)
+          .order('position', { ascending: true })
+          .limit(1)
+          .single();
+
+        return {
+          ...playlist,
+          video_count: playlist.video_count ?? 0,
+          thumbnail_url: firstVideo?.video?.thumbnail_url || null,
+        };
+      })
+    );
 
     res.json({
-      playlists: playlistsWithCount,
+      playlists: playlistsWithThumbnails,
       total: count,
       limit: parseInt(limit as string),
       offset: parseInt(offset as string),
