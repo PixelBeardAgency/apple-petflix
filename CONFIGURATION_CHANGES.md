@@ -227,6 +227,27 @@ CREATE POLICY "Admins can update reports" ON video_reports
 
 ---
 
+## 🔔 Add Push Notification Preferences to Profiles
+
+Push notification preferences need to be stored in the profiles table.
+
+Run in Supabase SQL Editor:
+
+```sql
+-- Add notification preference columns to profiles table
+ALTER TABLE profiles
+ADD COLUMN IF NOT EXISTS notification_follows BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS notification_comments BOOLEAN DEFAULT true,
+ADD COLUMN IF NOT EXISTS notification_videos BOOLEAN DEFAULT true;
+```
+
+These columns control which types of push notifications users receive:
+- `notification_follows`: Notifications when someone follows them
+- `notification_comments`: Notifications when someone comments on their videos
+- `notification_videos`: Notifications when people they follow share new videos
+
+---
+
 ## 🔐 Supabase Storage Configuration (for Profile Pictures)
 
 ### Create Storage Bucket for Avatars
