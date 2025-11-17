@@ -172,8 +172,14 @@ class PushNotificationService {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Failed to subscribe to push notifications');
+      let errorMessage = 'Failed to subscribe to push notifications';
+      try {
+        const data = await response.json();
+        errorMessage = data.error?.message || data.error || data.message || errorMessage;
+      } catch {
+        errorMessage = await response.text() || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
   }
 
@@ -218,8 +224,14 @@ class PushNotificationService {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Failed to unsubscribe from push notifications');
+      let errorMessage = 'Failed to unsubscribe from push notifications';
+      try {
+        const data = await response.json();
+        errorMessage = data.error?.message || data.error || data.message || errorMessage;
+      } catch {
+        errorMessage = await response.text() || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
   }
 
@@ -279,8 +291,14 @@ class PushNotificationService {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Failed to update preferences');
+      let errorMessage = 'Failed to update preferences';
+      try {
+        const data = await response.json();
+        errorMessage = data.error?.message || data.error || data.message || errorMessage;
+      } catch {
+        errorMessage = await response.text() || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
   }
 
@@ -299,8 +317,14 @@ class PushNotificationService {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Failed to get preferences');
+      let errorMessage = 'Failed to get preferences';
+      try {
+        const data = await response.json();
+        errorMessage = data.error?.message || data.error || data.message || errorMessage;
+      } catch {
+        errorMessage = await response.text() || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
 
     return await response.json();
@@ -318,8 +342,14 @@ class PushNotificationService {
     });
 
     if (!response.ok) {
-      const data = await response.json();
-      throw new Error(data.error || 'Failed to send test notification');
+      let errorMessage = 'Failed to send test notification';
+      try {
+        const data = await response.json();
+        errorMessage = data.error?.message || data.error || data.message || errorMessage;
+      } catch {
+        errorMessage = await response.text() || errorMessage;
+      }
+      throw new Error(errorMessage);
     }
   }
 }
