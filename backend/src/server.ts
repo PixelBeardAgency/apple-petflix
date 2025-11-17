@@ -16,6 +16,7 @@ import playlistRoutes from './routes/playlists';
 import tagRoutes from './routes/tags';
 import moderationRoutes from './routes/moderation';
 import pushRoutes from './routes/push';
+import profilesRoutes from './routes/profiles';
 import securityRoutes from './routes/security';
 
 dotenv.config();
@@ -123,6 +124,7 @@ app.get('/metrics', (_req, res) => {
 app.use('/api/youtube', youtubeRoutes);
 app.use('/api/videos', videoRoutes);
 app.use('/api/users', followRoutes);
+app.use('/api/profiles', profilesRoutes);
 app.use('/api/comments', commentRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/feed', feedRoutes);
