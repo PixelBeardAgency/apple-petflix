@@ -16,9 +16,9 @@ interface Playlist {
   name: string;
   description: string | null;
   is_public: boolean;
-  user_id: string;
-  created_at: string;
-  videos: any[];
+  user_id?: string;
+  created_at?: string;
+  videos?: any[];
 }
 
 export function PlaylistDetailPage() {
@@ -98,7 +98,7 @@ export function PlaylistDetailPage() {
 
     try {
       await playlistService.removeVideo(playlistId, videoId);
-      if (playlist) {
+      if (playlist && playlist.videos) {
         setPlaylist({
           ...playlist,
           videos: playlist.videos.filter((v) => v.id !== videoId),
@@ -144,7 +144,7 @@ export function PlaylistDetailPage() {
                     </h1>
                     <p className="text-muted-foreground">
                       {playlist.is_public ? '🌐 Public' : '🔒 Private'} •{' '}
-                      {playlist.videos.length} video{playlist.videos.length !== 1 ? 's' : ''}
+                      {playlist.videos?.length || 0} video{(playlist.videos?.length || 0) !== 1 ? 's' : ''}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -168,7 +168,7 @@ export function PlaylistDetailPage() {
                 )}
               </div>
 
-              {playlist.videos.length === 0 ? (
+              {(playlist.videos?.length || 0) === 0 ? (
                 <div className="text-center py-12">
                   <div className="text-6xl mb-4">📹</div>
                   <h3 className="text-xl font-semibold text-foreground mb-2">
@@ -182,7 +182,7 @@ export function PlaylistDetailPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {playlist.videos.map((video, index) => (
+                  {playlist.videos?.map((video, index) => (
                     <Card key={video.id}>
                       <div className="md:flex">
                         <div className="md:w-1/3">

@@ -46,6 +46,7 @@ export interface Playlist {
   user?: User;
   videos?: Video[];
   video_count?: number;
+  thumbnail_url?: string | null;
 }
 
 export interface Follower {
