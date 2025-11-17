@@ -4,11 +4,11 @@ import type { User } from '../types';
 
 class ProfileService {
   private async getAuthToken(): Promise<string> {
-    const token = localStorage.getItem('token');
-    if (!token) {
+    const { data } = await supabase.auth.getSession();
+    if (!data.session) {
       throw new Error('Not authenticated');
     }
-    return token;
+    return data.session.access_token;
   }
 
   /**
@@ -17,7 +17,7 @@ class ProfileService {
   async searchProfiles(query: string): Promise<User[]> {
     const token = await this.getAuthToken();
     const response = await fetch(
-      `${API_URL}/api/profiles/search?query=${encodeURIComponent(query)}`,
+      `${API_URL}/api/profiles/search?q=${encodeURIComponent(query)}`,
       {
         headers: {
           'Authorization': `Bearer ${token}`,
