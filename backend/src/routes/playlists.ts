@@ -50,10 +50,19 @@ router.get('/', authenticateUser, async (req: AuthRequest, res, next) => {
           .limit(1)
           .single();
 
+        // Extract thumbnail_url from the nested structure
+        let thumbnailUrl = null;
+        if (firstVideo && typeof firstVideo === 'object') {
+          const video = (firstVideo as any).video;
+          if (video && typeof video === 'object') {
+            thumbnailUrl = video.thumbnail_url || null;
+          }
+        }
+
         return {
           ...playlist,
           video_count: playlist.video_count ?? 0,
-          thumbnail_url: firstVideo?.video?.thumbnail_url || null,
+          thumbnail_url: thumbnailUrl,
         };
       })
     );
@@ -375,7 +384,8 @@ router.get('/check/:videoId', authenticateUser, async (req: AuthRequest, res, ne
       .eq('user_id', userId);
 
     if (!playlists || playlists.length === 0) {
-      return res.json({ playlistIds: [] });
+      res.json({ playlistIds: [] });
+      return;
     }
 
     const playlistIds = playlists.map(p => p.id);
