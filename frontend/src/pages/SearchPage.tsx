@@ -7,6 +7,7 @@ import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { Header } from '../components/Header';
+import { VideoPreviewModal } from '../components/VideoPreviewModal';
 import { debounce } from '../lib/utils';
 
 export function SearchPage() {
@@ -16,24 +17,48 @@ export function SearchPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState<'relevance' | 'date' | 'viewCount' | 'rating'>('relevance');
+  const [previewVideo, setPreviewVideo] = useState<YouTubeVideo | null>(null);
+  const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const searchVideos = async (searchQuery: string) => {
+  const searchVideos = async (searchQuery: string, pageToken?: string) => {
     if (!searchQuery.trim()) {
       setVideos([]);
+      setNextPageToken(null);
       return;
     }
 
-    setLoading(true);
+    if (pageToken) {
+      setLoadingMore(true);
+    } else {
+      setLoading(true);
+    }
     setError(null);
 
     try {
-      const result = await youtubeAPI.searchVideos(searchQuery, 20, sortOrder);
-      setVideos(result.videos);
+      const result = await youtubeAPI.searchVideos(searchQuery, 20, sortOrder, pageToken);
+      if (pageToken) {
+        // Append to existing videos
+        setVideos(prev => [...prev, ...result.videos]);
+      } else {
+        // Replace videos
+        setVideos(result.videos);
+      }
+      setNextPageToken(result.nextPageToken || null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to search videos');
-      setVideos([]);
+      if (!pageToken) {
+        setVideos([]);
+      }
     } finally {
       setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  const loadMoreVideos = () => {
+    if (nextPageToken && query) {
+      searchVideos(query, nextPageToken);
     }
   };
 
@@ -136,12 +161,21 @@ export function SearchPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {videos.map((video) => (
                   <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <div className="relative aspect-video">
+                    <div 
+                      className="relative aspect-video cursor-pointer group"
+                      onClick={() => setPreviewVideo(video)}
+                    >
                       <img
                         src={video.thumbnail}
                         alt={video.title}
                         className="w-full h-full object-cover"
                       />
+                      {/* Play overlay */}
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                        <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+                          <div className="w-0 h-0 border-t-8 border-t-transparent border-l-12 border-l-charcoal border-b-8 border-b-transparent ml-1"></div>
+                        </div>
+                      </div>
                     </div>
                     <CardHeader>
                       <CardTitle className="text-base line-clamp-2">
@@ -173,6 +207,20 @@ export function SearchPage() {
                   </Card>
                 ))}
               </div>
+
+              {/* Load More Button */}
+              {nextPageToken && (
+                <div className="mt-8 text-center">
+                  <Button 
+                    onClick={loadMoreVideos}
+                    disabled={loadingMore}
+                    size="lg"
+                    variant="outline"
+                  >
+                    {loadingMore ? 'Loading...' : 'Load More Videos'}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
@@ -190,6 +238,15 @@ export function SearchPage() {
           )}
         </div>
       </main>
+
+      {/* Video Preview Modal */}
+      {previewVideo && (
+        <VideoPreviewModal
+          videoId={previewVideo.id}
+          videoTitle={previewVideo.title}
+          onClose={() => setPreviewVideo(null)}
+        />
+      )}
     </div>
   );
 }

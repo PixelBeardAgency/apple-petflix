@@ -8,11 +8,14 @@ export class YouTubeAPIService {
   async searchVideos(
     query: string,
     maxResults: number = 10,
-    order: 'relevance' | 'date' | 'viewCount' | 'rating' = 'relevance'
-  ): Promise<{ videos: YouTubeVideo[]; count: number; query: string }> {
-    const response = await fetch(
-      `${API_URL}/api/youtube/search?q=${encodeURIComponent(query)}&maxResults=${maxResults}&order=${order}`
-    );
+    order: 'relevance' | 'date' | 'viewCount' | 'rating' = 'relevance',
+    pageToken?: string
+  ): Promise<{ videos: YouTubeVideo[]; count: number; query: string; nextPageToken?: string }> {
+    let url = `${API_URL}/api/youtube/search?q=${encodeURIComponent(query)}&maxResults=${maxResults}&order=${order}`;
+    if (pageToken) {
+      url += `&pageToken=${encodeURIComponent(pageToken)}`;
+    }
+    const response = await fetch(url);
 
     if (!response.ok) {
       const error = await response.json();

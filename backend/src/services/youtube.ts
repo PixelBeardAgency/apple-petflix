@@ -24,10 +24,11 @@ export class YouTubeService {
   async searchVideos(
     query: string,
     maxResults: number = 10,
-    order: 'relevance' | 'date' | 'viewCount' | 'rating' = 'relevance'
-  ): Promise<youtube_v3.Schema$SearchResult[]> {
-    const cacheKey = `search:${query}:${maxResults}:${order}`;
-    const cached = cache.get<youtube_v3.Schema$SearchResult[]>(cacheKey);
+    order: 'relevance' | 'date' | 'viewCount' | 'rating' = 'relevance',
+    pageToken?: string
+  ): Promise<{ results: youtube_v3.Schema$SearchResult[]; nextPageToken?: string }> {
+    const cacheKey = `search:${query}:${maxResults}:${order}:${pageToken || 'initial'}`;
+    const cached = cache.get<{ results: youtube_v3.Schema$SearchResult[]; nextPageToken?: string }>(cacheKey);
 
     if (cached) {
       logger.debug('Returning cached YouTube search results');
@@ -44,6 +45,7 @@ export class YouTubeService {
         type: ['video'],
         maxResults,
         order,
+        pageToken,
         relevanceLanguage: 'en',
         safeSearch: 'moderate',
         videoCategoryId: '15', // Pets & Animals category
@@ -53,9 +55,13 @@ export class YouTubeService {
       this.logQuotaUsage();
 
       const results = response.data.items || [];
-      cache.set(cacheKey, results);
+      const responseData = { 
+        results, 
+        nextPageToken: response.data.nextPageToken || undefined 
+      };
+      cache.set(cacheKey, responseData);
 
-      return results;
+      return responseData;
     } catch (error: any) {
       logger.error('YouTube API search error:', {
         message: error.message,

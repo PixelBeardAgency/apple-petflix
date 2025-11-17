@@ -9,11 +9,11 @@ const router = Router();
 /**
  * GET /api/youtube/search
  * Search for YouTube videos
- * Query params: q (search term), maxResults, order
+ * Query params: q (search term), maxResults, order, pageToken
  */
 router.get('/search', optionalAuth, youtubeSearchLimiter, async (req, res, next) => {
   try {
-    const { q, maxResults = '10', order = 'relevance' } = req.query;
+    const { q, maxResults = '10', order = 'relevance', pageToken } = req.query;
 
     if (!q || typeof q !== 'string') {
       throw new AppError('Search query is required', 400);
@@ -26,7 +26,12 @@ router.get('/search', optionalAuth, youtubeSearchLimiter, async (req, res, next)
 
     const max = Math.min(parseInt(maxResults as string, 10) || 10, 50);
 
-    const results = await youtubeService.searchVideos(q, max, searchOrder);
+    const { results, nextPageToken } = await youtubeService.searchVideos(
+      q, 
+      max, 
+      searchOrder,
+      pageToken as string | undefined
+    );
 
     // Transform results to a cleaner format
     const videos = results.map((item) => ({
@@ -42,6 +47,7 @@ router.get('/search', optionalAuth, youtubeSearchLimiter, async (req, res, next)
       videos,
       count: videos.length,
       query: q,
+      nextPageToken,
     });
   } catch (error) {
     next(error);
