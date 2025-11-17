@@ -1,6 +1,8 @@
 # 🧪 Petflix - End-to-End Testing Guide
 
-This document provides a comprehensive testing checklist for all Petflix features. Use this to systematically test the application and identify any issues.
+This document provides a comprehensive testing checklist for all **implemented** Petflix features. Use this to systematically test the application and identify any issues.
+
+> **Note:** This guide only includes features that are currently implemented in the codebase. Features marked as "Not Implemented" are documented at the end for future reference.
 
 ---
 
@@ -26,8 +28,7 @@ This document provides a comprehensive testing checklist for all Petflix feature
 - [ ] Enter valid email, username, password
 - [ ] Submit registration form
 - [ ] Verify account is created
-- [ ] Check welcome notification/message
-- [ ] Verify redirect to appropriate page
+- [ ] Verify redirect to feed/onboarding
 
 ### Login
 - [ ] Navigate to login page
@@ -38,87 +39,94 @@ This document provides a comprehensive testing checklist for all Petflix feature
 - [ ] Verify auth token is stored
 
 ### Logout
-- [ ] Click logout button
+- [ ] Click logout button in header
 - [ ] Verify redirect to login/home
 - [ ] Verify session is cleared
-- [ ] Try accessing protected routes (should redirect)
+- [ ] Try accessing protected routes (should redirect to login)
 
-### Password Reset (if implemented)
-- [ ] Request password reset
-- [ ] Check email received
-- [ ] Follow reset link
-- [ ] Set new password
-- [ ] Login with new password
+### Invalid Login
+- [ ] Enter wrong password
+- [ ] Verify error message displays
+- [ ] Try multiple failed attempts (should rate limit after 5 attempts)
 
 ---
 
-## 🏠 2. Home/Landing Page
+## 🏠 2. Landing Page
 
 ### Initial Load
 - [ ] Page loads without errors
 - [ ] Hero section displays correctly
-- [ ] Call-to-action buttons are visible
+- [ ] "Get Started" button is visible
+- [ ] "Sign In" button is visible
 - [ ] Navigation menu works
+- [ ] Pet emoji (🐾) displays in header
 
-### Unauthenticated User
-- [ ] Sign up button is visible
-- [ ] Login button is visible
-- [ ] Can't access protected features
+### Unauthenticated Access
+- [ ] Verify "Get Started" redirects to registration
+- [ ] Verify "Sign In" redirects to login
+- [ ] Can't access feed, profile, or other protected pages
 
 ---
 
-## 📺 3. Video Discovery & Feed
+## 🔍 3. Video Search & Discovery
 
-### Feed Page
-- [ ] Navigate to "Your Feed"
-- [ ] Videos load correctly
-- [ ] Thumbnail images display
-- [ ] Video titles and metadata show
-- [ ] Scroll triggers infinite loading (if implemented)
-- [ ] "Load More" button works (if present)
-
-### Video Search
-- [ ] Open search bar
+### Search Functionality
+- [ ] Navigate to Search page
 - [ ] Enter search term (e.g., "cute cats")
 - [ ] Press enter or click search
-- [ ] Results display correctly
+- [ ] Results display with thumbnails
+- [ ] Video titles and metadata show correctly
 - [ ] Try different search terms
-- [ ] Search for non-existent content
-- [ ] Clear search and return to feed
+- [ ] Search for non-existent content (verify "No results found")
 
-### Video Categories/Filters (if implemented)
-- [ ] Select different categories
-- [ ] Filter by pet type (cats, dogs, etc.)
-- [ ] Verify filtered results match selection
-- [ ] Clear filters
+### Search Results Display
+- [ ] Thumbnails are prominent and load correctly
+- [ ] Video title displays
+- [ ] Channel name displays
+- [ ] View count displays
+- [ ] Click on a result navigates to video detail
+
+### Search Pagination
+- [ ] Scroll to bottom of results
+- [ ] "Load More" button appears
+- [ ] Click "Load More"
+- [ ] Additional results load without page refresh
+
+### Search Edge Cases
+- [ ] Search with special characters (e.g., "cat & dog")
+- [ ] Search with very long query
+- [ ] Search with empty query (should show validation)
 
 ---
 
-## 🎬 4. Video Playback & Details
+## 📺 4. Video Playback & Details
 
 ### Video Detail Page
-- [ ] Click on a video thumbnail
+- [ ] Click on a video from search or feed
 - [ ] Video detail page loads
-- [ ] Video player appears
-- [ ] Video metadata displays (title, description, views, date)
-- [ ] Creator/channel info shows
+- [ ] YouTube video player embeds correctly
+- [ ] Video metadata displays (title, description, channel)
+- [ ] View count displays
 
 ### Video Player
+- [ ] Video player loads
 - [ ] Click play button
 - [ ] Video plays without errors
 - [ ] Pause button works
 - [ ] Volume controls work
 - [ ] Fullscreen toggle works
-- [ ] Quality settings work (if available)
-- [ ] Playback speed controls work (if available)
+- [ ] Progress bar seeking works
 
 ### Video Actions
-- [ ] Like button works
-- [ ] Like count updates immediately
-- [ ] Unlike by clicking again
-- [ ] Share button opens share modal
-- [ ] Copy link to clipboard
-- [ ] Add to playlist button works
+- [ ] "Add to Playlist" button is visible
+- [ ] Click "Add to Playlist"
+- [ ] Modal opens with playlist options
+- [ ] Share button works (if present)
+
+### Error Handling
+- [ ] Navigate to invalid video ID
+- [ ] Verify error message displays
+- [ ] Retry button appears (if applicable)
 
 ---
 
@@ -128,34 +136,38 @@ This document provides a comprehensive testing checklist for all Petflix feature
 - [ ] Comments section displays below video
 - [ ] Existing comments load
 - [ ] Comment count is accurate
-- [ ] User avatars display
-- [ ] Timestamps are correct
+- [ ] User avatars/names display
+- [ ] Timestamps are correct and formatted
 
 ### Create Comment
-- [ ] Enter comment text
-- [ ] Submit comment
-- [ ] New comment appears immediately
+- [ ] Enter comment text in input field
+- [ ] Click submit/post button
+- [ ] New comment appears immediately at top
 - [ ] Comment count increments
-- [ ] Try submitting empty comment (should fail)
-- [ ] Try very long comment (test limits)
+- [ ] Try submitting empty comment (should fail with validation)
+- [ ] Try very long comment (should enforce 2000 char limit)
 
-### Edit Comment (if implemented)
-- [ ] Click edit on your comment
+### Edit Comment
+- [ ] Find your own comment
+- [ ] Click "Edit" button
+- [ ] Text input appears with current text
 - [ ] Modify text
-- [ ] Save changes
-- [ ] Verify updated text displays
+- [ ] Click "Save"
+- [ ] Updated text displays
+- [ ] "(edited)" indicator appears
 
 ### Delete Comment
-- [ ] Click delete on your comment
+- [ ] Find your own comment
+- [ ] Click "Delete" button
+- [ ] Confirmation dialog appears (if present)
 - [ ] Confirm deletion
-- [ ] Comment is removed
+- [ ] Comment is removed immediately
 - [ ] Comment count decrements
 
-### Comment Interactions
-- [ ] Like a comment
-- [ ] Unlike a comment
-- [ ] Reply to a comment (if threaded)
-- [ ] View nested replies
+### Comment Permissions
+- [ ] Can only edit/delete your own comments
+- [ ] Can't edit other users' comments
+- [ ] Edit/delete buttons don't show on others' comments
 
 ---
 
@@ -164,119 +176,142 @@ This document provides a comprehensive testing checklist for all Petflix feature
 ### View Playlists
 - [ ] Navigate to Playlists page
 - [ ] User's playlists display
-- [ ] Playlist thumbnails show
-- [ ] Video count is accurate
+- [ ] Playlist cards show thumbnails
+- [ ] Video count displays on each playlist
 - [ ] Public/private indicator shows
 
-### Create Playlist
+### Create Playlist (Standard)
 - [ ] Click "Create Playlist" button
+- [ ] Modal/form opens
 - [ ] Enter playlist name
 - [ ] Enter description (optional)
-- [ ] Set privacy (public/private)
+- [ ] Set privacy (public/private toggle)
 - [ ] Submit form
 - [ ] New playlist appears in list
 
-### Create Playlist from Video (Inline Creation)
-- [ ] Go to any video
+### Create Playlist from Video (Inline Creation - NEW!)
+**When User Has No Playlists:**
+- [ ] Go to any video detail page
 - [ ] Click "Add to Playlist"
-- [ ] If no playlists: form appears to create one
+- [ ] Modal shows "You don't have any playlists yet"
+- [ ] Inline form appears with name input
 - [ ] Enter playlist name
 - [ ] Click "Create Playlist & Add Video"
-- [ ] Verify playlist created and video added
-- [ ] Success message displays
+- [ ] Success message shows with playlist name
+- [ ] Modal closes automatically after 1.5 seconds
+- [ ] Verify video was added to new playlist
 
-### Create Playlist When Playlists Exist
-- [ ] Click "Add to Playlist" on a video
-- [ ] Scroll to "Or create a new playlist" section
-- [ ] Enter new playlist name
+**When User Has Existing Playlists:**
+- [ ] Go to any video detail page
+- [ ] Click "Add to Playlist"
+- [ ] List of existing playlists shows at top
+- [ ] Scroll to bottom
+- [ ] "Or create a new playlist" section visible
+- [ ] Enter new playlist name in bottom form
 - [ ] Click "Create & Add"
-- [ ] Verify new playlist created and video added
+- [ ] Success message displays
+- [ ] Video is added to newly created playlist
+- [ ] Can verify by going to Playlists page
 
 ### Edit Playlist
-- [ ] Click edit on a playlist
+- [ ] Click on a playlist
+- [ ] Click "Edit" button
 - [ ] Update name
 - [ ] Update description
 - [ ] Change privacy setting
 - [ ] Save changes
-- [ ] Verify updates display
+- [ ] Verify updates display correctly
 
-### Add Videos to Playlist
+### Add Videos to Existing Playlist
 - [ ] Open a video detail page
 - [ ] Click "Add to Playlist"
-- [ ] Select a playlist
-- [ ] Verify video is added
-- [ ] Check video appears in playlist
+- [ ] Select an existing playlist from list
+- [ ] Success message appears
+- [ ] Navigate to that playlist
+- [ ] Verify video appears in playlist
 
 ### Remove Videos from Playlist
 - [ ] Open a playlist
-- [ ] Click remove on a video
-- [ ] Confirm removal
+- [ ] Find a video in the playlist
+- [ ] Click remove/delete button
+- [ ] Confirm removal (if dialog appears)
 - [ ] Video is removed from list
 - [ ] Video count updates
 
 ### Delete Playlist
+- [ ] Navigate to Playlists page
 - [ ] Click delete on a playlist
+- [ ] Confirmation dialog appears
 - [ ] Confirm deletion
 - [ ] Playlist is removed from list
 
-### Play Playlist
-- [ ] Open a playlist
-- [ ] Click play on first video
-- [ ] Video plays
-- [ ] Check if autoplay to next video works (if implemented)
+### Playlist Detail View
+- [ ] Click on a playlist
+- [ ] Playlist detail page loads
+- [ ] All videos in playlist display
+- [ ] Video thumbnails and titles show
+- [ ] Click on a video navigates to video detail
 
 ---
 
 ## 👤 7. User Profile
 
 ### View Own Profile
-- [ ] Click on profile link/avatar
+- [ ] Click on your profile link/avatar in header
 - [ ] Profile page loads
-- [ ] User info displays (username, avatar, bio)
-- [ ] Profile stats show (followers, following, videos)
+- [ ] Username displays correctly
+- [ ] User avatar displays (or default)
+- [ ] Bio displays (if set)
 
-### Profile Tabs
+### Profile Tabs (All 4 Tabs)
 
 #### Videos Tab
-- [ ] Tab loads by default
-- [ ] Shared videos display
-- [ ] Video cards show thumbnails and metadata
+- [ ] Videos tab is selected by default on page load
+- [ ] User's shared videos display immediately (no need to switch tabs)
+- [ ] Video cards show thumbnails and titles
 - [ ] Click on video navigates to detail page
-- [ ] Empty state shows if no videos
+- [ ] If no videos: "No videos yet" empty state shows
 
 #### Playlists Tab
-- [ ] Click Playlists tab
+- [ ] Click "Playlists" tab
 - [ ] User's playlists display
 - [ ] Playlist cards show correctly
-- [ ] Click on playlist opens it
-- [ ] Empty state shows if no playlists
+- [ ] Video count displays on each playlist
+- [ ] Click on playlist opens detail page
+- [ ] If no playlists: Empty state with "Create Playlist" option shows
 
 #### Followers Tab
-- [ ] Click Followers tab
+- [ ] Click "Followers" tab
 - [ ] List of followers displays
 - [ ] User avatars and usernames show
 - [ ] Click on user navigates to their profile
-- [ ] Empty state shows if no followers
+- [ ] If no followers: "No followers yet" empty state shows
 
 #### Following Tab
-- [ ] Click Following tab
+- [ ] Click "Following" tab
 - [ ] List of followed users displays
 - [ ] User avatars and usernames show
 - [ ] Click on user navigates to their profile
-- [ ] Empty state shows if not following anyone
+- [ ] If no following: "Not following anyone yet" empty state shows
+
+### Tab Switching
+- [ ] Switch between all 4 tabs multiple times
+- [ ] Data loads correctly each time
+- [ ] No duplicate data loading
+- [ ] Switching is smooth without flickering
 
 ### Edit Profile
-- [ ] Click "Edit Profile" button
+- [ ] Click "Edit Profile" button (if present)
 - [ ] Update username
 - [ ] Update bio
 - [ ] Upload/change avatar
 - [ ] Save changes
-- [ ] Verify updates display
+- [ ] Verify updates display on profile
 
 ### View Other User's Profile
-- [ ] Click on another user's name/avatar
+- [ ] Click on another user's name/avatar (from comment, follower list, etc.)
 - [ ] Their profile loads
-- [ ] Can't see edit button
+- [ ] Can't see "Edit Profile" button
 - [ ] Can see their public content
 - [ ] Follow button is visible
 
@@ -287,341 +322,342 @@ This document provides a comprehensive testing checklist for all Petflix feature
 ### Follow/Unfollow
 - [ ] Visit another user's profile
 - [ ] Click "Follow" button
-- [ ] Button changes to "Following"
-- [ ] Follower count updates
-- [ ] Click "Following" to unfollow
-- [ ] Confirm unfollowing
-- [ ] Counts update
+- [ ] Button changes to "Following" or "Unfollow"
+- [ ] Follower count increments
+- [ ] Go to your Following tab - user appears there
+- [ ] Click "Following"/"Unfollow" to unfollow
+- [ ] Follower count decrements
+- [ ] User removed from your Following tab
+
+### Feed (Following Feed)
+- [ ] Navigate to "Your Feed" page
+- [ ] Videos from followed users display
+- [ ] Videos are in chronological order (newest first)
+- [ ] Video thumbnails and metadata show
+- [ ] Click on video navigates to detail
+- [ ] If not following anyone: Empty state message shows
 
 ### Notifications
-- [ ] Trigger notification (like, comment, follow, etc.)
-- [ ] Bell icon shows unread count
+- [ ] Notification bell icon in header
+- [ ] Unread notification count shows (red badge)
 - [ ] Click notification bell
-- [ ] Dropdown/page shows notifications
+- [ ] Notifications dropdown/panel opens
+- [ ] Recent notifications display
 - [ ] Click on notification navigates to related content
 - [ ] Mark notification as read
-- [ ] Mark all as read
 
 ### Share Video
-- [ ] Click share button on video
-- [ ] Share modal opens
-- [ ] Copy link button works
-- [ ] Social media buttons work (if implemented)
-- [ ] Close modal
+- [ ] Navigate to Share Video page
+- [ ] Enter YouTube URL
+- [ ] Add title (optional)
+- [ ] Add description (optional)
+- [ ] Submit
+- [ ] Video is shared to your profile
+- [ ] Video appears in feed for your followers
 
 ---
 
 ## 🔔 9. Push Notifications
 
 ### Enable Push Notifications
-- [ ] Prompt appears to enable notifications
+- [ ] Notification prompt appears (after login or on first visit)
 - [ ] Click "Enable Notifications"
 - [ ] Browser permission dialog appears
 - [ ] Accept permission
-- [ ] Confirmation message shows
+- [ ] Confirmation/success message shows
+
+### Notification Settings
+- [ ] Navigate to Notification Settings page
+- [ ] Toggle options are visible (follow, comment, like notifications)
+- [ ] Toggle notifications on/off
+- [ ] Save preferences
+- [ ] Verify preferences persist after page refresh
 
 ### Receive Push Notifications
-- [ ] Have another user trigger notification (comment, like, follow)
+- [ ] Have another user follow you
 - [ ] Push notification appears on device
+- [ ] Have another user comment on your video
+- [ ] Push notification appears
 - [ ] Click notification opens app to relevant page
 
 ### Disable Push Notifications
-- [ ] Access notification settings
+- [ ] Go to Notification Settings
 - [ ] Disable push notifications
-- [ ] Verify notifications stop
+- [ ] Trigger notification event
+- [ ] Verify no notification appears
 
 ---
 
-## 🛡️ 10. Content Moderation (Admin)
+## 🛡️ 10. Content Moderation (Admin Only)
 
 ### Admin Access
 - [ ] Login as admin user
-- [ ] Admin menu/section is visible
-- [ ] Navigate to moderation dashboard
+- [ ] Navigate to Moderation page (`/moderation`)
+- [ ] Moderation dashboard is accessible
 
-### Flag Content
-- [ ] Flag a video as inappropriate
-- [ ] Flag a comment as spam
-- [ ] Reason for flagging is required
-- [ ] Flag is submitted
+### Flag Content (Regular User)
+- [ ] Find a video
+- [ ] Click "Report" button (if present)
+- [ ] Select reason for flagging
+- [ ] Submit report
 
 ### Review Flagged Content (Admin)
-- [ ] View list of flagged content
+- [ ] View list of flagged content in moderation dashboard
 - [ ] See flag details (reason, reporter)
 - [ ] Preview flagged content
-- [ ] Approve or remove content
+- [ ] Click "Approve" (keep content)
+- [ ] Click "Remove" (delete content)
 - [ ] Action is recorded
 
-### Block User (Admin)
-- [ ] Search for user
-- [ ] Click block/ban
-- [ ] Enter reason
-- [ ] Confirm action
-- [ ] User is blocked from actions
+### Non-Admin Access
+- [ ] Login as regular user
+- [ ] Try accessing `/moderation`
+- [ ] Should be denied or redirected
 
 ---
 
-## 🔍 11. Search & Discovery
+## 📱 11. Mobile Responsiveness
 
-### Global Search
-- [ ] Click search icon/bar
-- [ ] Enter search term
-- [ ] Results show videos matching query
-- [ ] Results show users (if implemented)
-- [ ] Results show playlists (if implemented)
-- [ ] Click on result navigates correctly
+### Navigation (Mobile)
+- [ ] Open app on mobile viewport (or use DevTools, resize to 375px)
+- [ ] Header is responsive
+- [ ] All header links are accessible
+- [ ] Navigation doesn't require horizontal scrolling
+- [ ] All menu items fit on screen
 
-### Advanced Filters (if implemented)
-- [ ] Filter by upload date
-- [ ] Filter by duration
-- [ ] Filter by views/popularity
-- [ ] Sort results (relevance, date, views)
-
-### Trending/Popular
-- [ ] Navigate to trending section
-- [ ] Popular videos display
-- [ ] Based on views/likes/recent activity
-
----
-
-## 📱 12. Mobile Responsiveness
-
-### Navigation
-- [ ] Open app on mobile viewport (or use DevTools)
-- [ ] Hamburger menu appears on small screens
-- [ ] Click hamburger menu
-- [ ] Navigation drawer/menu opens
-- [ ] All links are accessible
-- [ ] Close menu by clicking outside or close button
-
-### Layout
-- [ ] All pages are responsive
-- [ ] Text is readable (no tiny fonts)
-- [ ] Buttons are tappable (min 44px)
+### Layout (Mobile)
+- [ ] All pages are responsive at 320px width
+- [ ] All pages are responsive at 375px width (iPhone)
+- [ ] All pages are responsive at 768px width (tablet)
+- [ ] Text is readable (minimum 16px font size)
+- [ ] Buttons are tappable (minimum 44x44px)
 - [ ] Images scale correctly
 - [ ] No horizontal scrolling (unless intentional)
-- [ ] Forms are usable
 
-### Video Player
+### Forms (Mobile)
+- [ ] Login form is usable on mobile
+- [ ] Registration form is usable on mobile
+- [ ] Comment input is usable on mobile
+- [ ] Search bar is usable on mobile
+- [ ] All inputs zoom correctly (no zoom-in on focus)
+
+### Video Player (Mobile)
 - [ ] Video player is responsive
-- [ ] Controls are accessible on mobile
-- [ ] Fullscreen works on mobile
+- [ ] Player controls are accessible on mobile
+- [ ] Fullscreen works on mobile device
 
 ### Touch Interactions
-- [ ] Swipe gestures work (if implemented)
 - [ ] Tap interactions are responsive
-- [ ] No double-tap zoom issues
+- [ ] Scrolling is smooth
+- [ ] No accidental double-tap zoom
 
 ---
 
-## ⚡ 13. Performance
+## ⚡ 12. Performance
 
 ### Page Load Times
-- [ ] Home page loads quickly (< 3 seconds)
+- [ ] Landing page loads quickly (< 3 seconds)
 - [ ] Feed page loads quickly
 - [ ] Video detail page loads quickly
 - [ ] Profile page loads quickly
+- [ ] Search results appear quickly
 
 ### Video Loading
-- [ ] Video thumbnails load quickly
+- [ ] Video thumbnails load progressively
 - [ ] Video player initializes quickly
 - [ ] Video starts playing within 2-3 seconds
 
-### Infinite Scroll/Pagination
-- [ ] Scrolling is smooth
-- [ ] New content loads without freezing
-- [ ] Loading indicators show during fetch
-
-### Caching
-- [ ] Revisit pages load from cache
-- [ ] Images are cached
-- [ ] API responses are cached (where appropriate)
+### Smooth Interactions
+- [ ] Scrolling is smooth on all pages
+- [ ] Tab switching is instant
+- [ ] Modal open/close is smooth
+- [ ] Button clicks are responsive
 
 ---
 
-## 🔒 14. Security & Privacy
+## 🔒 13. Security & Privacy
 
 ### Authentication
-- [ ] Can't access protected routes without login
+- [ ] Can't access feed without login
+- [ ] Can't access profile without login
+- [ ] Can't access playlists without login
 - [ ] Auth tokens expire appropriately
-- [ ] Session management works correctly
+- [ ] Session persists across page refreshes
 
 ### Authorization
-- [ ] Can't edit other users' content
+- [ ] Can't edit other users' profiles
 - [ ] Can't delete other users' comments
+- [ ] Can't edit other users' playlists
 - [ ] Admin features only visible to admins
-- [ ] API endpoints respect permissions
 
 ### Data Privacy
 - [ ] Private playlists not visible to others
-- [ ] User email not exposed publicly
-- [ ] Profile privacy settings work (if implemented)
+- [ ] User email not exposed in public API
+- [ ] Can't access other users' notification settings
+
+### Rate Limiting
+- [ ] Multiple failed login attempts trigger rate limit (5 attempts)
+- [ ] Rate limit message displays
+- [ ] Must wait before trying again
 
 ---
 
-## 🌐 15. Progressive Web App (PWA)
+## 🌐 14. Progressive Web App (PWA)
 
 ### Installation
-- [ ] "Install App" prompt appears
+- [ ] "Install App" prompt appears (in supported browsers)
 - [ ] Click install
 - [ ] App installs to device
 - [ ] Open installed app
-- [ ] Works as standalone app
+- [ ] App opens in standalone mode (no browser UI)
+
+### PWA Manifest
+- [ ] App name displays correctly after install
+- [ ] App icon displays on home screen/app list
+- [ ] Theme color is correct
+- [ ] Splash screen appears on launch
 
 ### Offline Functionality
+- [ ] Open app while online
+- [ ] Browse a few pages (feed, profile, video)
 - [ ] Disconnect from internet
-- [ ] App still loads
+- [ ] App still loads basic UI
 - [ ] Cached content is accessible
-- [ ] Offline indicator shows
+- [ ] Offline indicator shows (if implemented)
 - [ ] Graceful error messages for unavailable content
 
 ### Service Worker
-- [ ] Service worker registers successfully
-- [ ] Updates are detected
-- [ ] Update prompt appears when new version available
-- [ ] Refresh to get new version works
+- [ ] Service worker registers successfully (check console)
+- [ ] Service worker caches assets
+- [ ] Navigate offline and verify cached assets load
+
+### App Updates
+- [ ] When new version is deployed
+- [ ] Update notification appears (if implemented)
+- [ ] Click to refresh and get new version
+- [ ] App updates successfully
 
 ---
 
-## 🐛 16. Error Handling
+## 🎨 15. UI/UX & Design
 
-### Network Errors
-- [ ] Disconnect internet during API call
-- [ ] Appropriate error message displays
-- [ ] Retry button available
-- [ ] App doesn't crash
-
-### Invalid Data
-- [ ] Enter invalid form data
-- [ ] Validation errors show
-- [ ] Submit empty required fields
-- [ ] Field-specific errors display
-
-### 404 Not Found
-- [ ] Navigate to non-existent route
-- [ ] 404 page displays
-- [ ] "Go Home" link works
-
-### API Errors
-- [ ] Trigger API error (e.g., rate limit)
-- [ ] Error message is user-friendly
-- [ ] Technical details not exposed
-- [ ] App recovers gracefully
-
----
-
-## 🎨 17. UI/UX
+### Color Palette
+- [ ] Cream background (#F0F0DC) is used
+- [ ] Charcoal text (#36454F) is used
+- [ ] Light Blue accents (#ADD8E6) are used
+- [ ] Color contrast meets accessibility standards
 
 ### Visual Consistency
-- [ ] Consistent color scheme throughout
-- [ ] Fonts are consistent
-- [ ] Button styles match
-- [ ] Spacing is uniform
+- [ ] Buttons have consistent styling
+- [ ] Cards have consistent styling
+- [ ] Typography is consistent
+- [ ] Spacing is uniform across pages
+- [ ] Rounded corners (border-radius) are consistent
 
-### Accessibility
-- [ ] All interactive elements are keyboard accessible
-- [ ] Tab order is logical
-- [ ] Focus indicators are visible
-- [ ] Alt text on images
-- [ ] ARIA labels where appropriate
-- [ ] Color contrast meets WCAG standards
+### Shadcn UI Components
+- [ ] Video cards use Shadcn Card component
+- [ ] Search uses Shadcn Input component
+- [ ] CTAs use Shadcn Button component
+- [ ] Modals use Shadcn Dialog component
+- [ ] Tabs use Shadcn Tabs component
+
+### Loading States
+- [ ] Loading spinners display during API calls
+- [ ] Skeleton loaders for video cards (if implemented)
+- [ ] Button shows loading state during submission
+- [ ] No blank white screens during loading
+
+### Feedback & Errors
+- [ ] Success messages display after actions (green toast)
+- [ ] Error messages are clear and helpful (red toast)
+- [ ] Form validation errors are specific
+- [ ] Network errors have friendly messages
 
 ### Animations
-- [ ] Transitions are smooth
-- [ ] Loading spinners display during waits
-- [ ] Hover effects work
-- [ ] No jarring/too-fast animations
+- [ ] Page transitions are smooth
+- [ ] Modal open/close is smooth
+- [ ] Hover effects work on buttons
+- [ ] No jarring or too-fast animations
 
-### Feedback
-- [ ] Success messages display after actions
-- [ ] Error messages are clear
-- [ ] Loading states show for async operations
-- [ ] Disabled states are obvious
+### Empty States
+- [ ] "No videos yet" shows when profile has no videos
+- [ ] "No playlists yet" shows with create option
+- [ ] "No followers yet" shows in followers tab
+- [ ] "Not following anyone" shows in following tab
+- [ ] "No results found" shows for empty search
+- [ ] Empty states have helpful CTAs
 
 ---
 
-## 🔗 18. Deep Linking & Routing
+## 🔗 16. Deep Linking & Routing
 
 ### Direct URLs
-- [ ] Copy video URL and open in new tab
-- [ ] Video loads correctly
-- [ ] Copy profile URL and open in new tab
-- [ ] Profile loads correctly
-- [ ] Copy playlist URL and open in new tab
-- [ ] Playlist loads correctly
+- [ ] Copy video URL and open in new tab → Video loads correctly
+- [ ] Copy profile URL and open in new tab → Profile loads correctly
+- [ ] Copy playlist URL and open in new tab → Playlist loads correctly
+- [ ] Share video URL with friend → They can access it
 
 ### Browser Navigation
-- [ ] Back button works correctly
+- [ ] Back button works correctly on all pages
 - [ ] Forward button works correctly
 - [ ] Browser history is accurate
-- [ ] Page state is preserved
+- [ ] Page refreshes maintain state (if logged in)
+
+### Protected Routes
+- [ ] Direct URL to `/feed` while logged out → Redirects to login
+- [ ] Direct URL to `/profile` while logged out → Redirects to login
+- [ ] After login from redirect → Redirects back to intended page
 
 ---
 
-## 💾 19. Data Persistence
+## 🎯 17. End-to-End User Flows
 
-### Local Storage
-- [ ] Preferences are saved (theme, settings)
-- [ ] Auth tokens persist across sessions
-- [ ] Form data is preserved (if implemented)
+### New User Journey
+1. [ ] Land on homepage
+2. [ ] Click "Get Started"
+3. [ ] Register new account (email, username, password)
+4. [ ] Login automatically or manually
+5. [ ] Onboarding tutorial appears (if implemented)
+6. [ ] Navigate to Search
+7. [ ] Search for "cute cats"
+8. [ ] Click on a video
+9. [ ] Watch video
+10. [ ] Leave a comment
+11. [ ] Create first playlist from video (inline creation)
+12. [ ] Add video to playlist
+13. [ ] Navigate to Profile
+14. [ ] View shared playlists
+15. [ ] Navigate to Feed
+16. [ ] Follow another user
+17. [ ] See followed user's videos in feed
 
-### Session Management
-- [ ] Login state persists across page refreshes
-- [ ] Session expires after inactivity (if implemented)
-- [ ] Re-login prompt appears when session expires
-
----
-
-## 📊 20. Analytics & Tracking (if implemented)
-
-### View Tracking
-- [ ] Video views are counted
-- [ ] View count increments
-- [ ] Watch time is tracked
-
-### Engagement Metrics
-- [ ] Likes are tracked
-- [ ] Comments are counted
-- [ ] Shares are tracked
-
----
-
-## 🧪 Testing Different Scenarios
-
-### New User Flow
-1. Register new account
-2. Verify email (if required)
-3. Complete onboarding
-4. Browse feed
-5. Watch first video
-6. Create first playlist
-7. Add video to playlist
-8. Follow a user
-9. Comment on a video
-
-### Power User Flow
-1. Login to existing account
-2. Check notifications
-3. View own profile
-4. Create new playlist
-5. Add multiple videos to playlist
-6. Share a video
-7. Comment on multiple videos
-8. Follow several users
-9. Check followers/following
+### Content Creator Flow
+1. [ ] Login to account
+2. [ ] Navigate to Share Video page
+3. [ ] Enter YouTube URL
+4. [ ] Add title and description
+5. [ ] Share video
+6. [ ] Video appears on profile
+7. [ ] Create playlist
+8. [ ] Add multiple videos to playlist
+9. [ ] Make playlist public
+10. [ ] Share playlist with others
 
 ### Social Interaction Flow
-1. User A creates and shares video
-2. User B sees video in feed
-3. User B likes and comments
-4. User A receives notification
-5. User A replies to comment
-6. User B follows User A
-7. User A follows back
+1. [ ] User A shares a video
+2. [ ] User B sees video in feed (if following)
+3. [ ] User B clicks video
+4. [ ] User B likes video (if implemented)
+5. [ ] User B comments on video
+6. [ ] User A receives notification
+7. [ ] User A clicks notification
+8. [ ] User A sees User B's comment
+9. [ ] User A replies to comment
+10. [ ] User B receives notification
 
 ---
 
-## 📝 Bug Report Template
+## 🐛 Bug Report Template
 
 When you find issues, please provide:
 
@@ -647,12 +683,16 @@ When you find issues, please provide:
 - OS: 
 - Screen Size: 
 - URL: 
+- Logged In: Yes/No
 
 **Screenshots/Video**:
 [Attach if helpful]
 
 **Console Errors**:
-[Any errors in browser console]
+[Any errors in browser console - press F12]
+
+**Network Errors**:
+[Any failed API calls in Network tab]
 
 **Additional Context**:
 [Anything else relevant]
@@ -662,35 +702,66 @@ When you find issues, please provide:
 
 ## ✅ Testing Checklist Summary
 
-### Critical Path (Must Work)
+### Critical Path (Must Work Perfectly)
 - [ ] User registration
-- [ ] User login
-- [ ] Video feed loads
-- [ ] Video playback works
-- [ ] Create playlist
+- [ ] User login/logout
+- [ ] Video search with YouTube API
+- [ ] Video playback
+- [ ] Comment creation and deletion
+- [ ] Create playlist (standard + inline)
 - [ ] Add video to playlist
 - [ ] User profile displays correctly
-- [ ] Profile tabs load data (Videos, Playlists, Followers, Following)
+- [ ] All 4 profile tabs load data (Videos, Playlists, Followers, Following)
+- [ ] Follow/unfollow users
+- [ ] Feed shows followed users' videos
 
 ### High Priority
-- [ ] Search functionality
-- [ ] Comments system
-- [ ] Follow/unfollow
-- [ ] Notifications
-- [ ] Mobile responsiveness
-- [ ] Inline playlist creation
+- [ ] Edit comments
+- [ ] Edit playlists
+- [ ] Push notifications subscribe/unsubscribe
+- [ ] Share videos to profile
+- [ ] Mobile responsiveness on all pages
+- [ ] PWA installation
+- [ ] Notification bell with unread count
+- [ ] Error handling throughout
 
 ### Medium Priority
-- [ ] Push notifications
-- [ ] PWA features
-- [ ] Content moderation
-- [ ] Advanced filters
+- [ ] Content moderation (admin)
+- [ ] Notification settings page
+- [ ] Profile edit functionality
+- [ ] Playlist privacy settings
+- [ ] Rate limiting on login
 
 ### Nice to Have
-- [ ] Trending section
-- [ ] Analytics
-- [ ] Themes/preferences
-- [ ] Advanced social features
+- [ ] Offline PWA functionality
+- [ ] Service worker caching
+- [ ] Skeleton loading states
+- [ ] Smooth animations
+
+---
+
+## ⚠️ Known Limitations & Future Features
+
+The following features are **NOT currently implemented** but were mentioned in the PRD:
+
+### Not Implemented:
+1. **Password Reset Flow** - "Forgot Password" link exists but full flow not implemented
+2. **Threaded Comment Replies** - Comments exist but no nested/threaded replies
+3. **Video Categories/Filters** - No category filtering on search/feed
+4. **Trending Section** - No trending videos page
+5. **Autoplay Next Video in Playlist** - Manual navigation only
+6. **Advanced Search Filters** - No filter by upload date, duration, etc.
+7. **Video Like/Upvote** - No like functionality on videos (only comments)
+8. **Watch Time Tracking** - No analytics on watch duration
+9. **TV Casting** - Cast button exists in code but functionality not fully tested
+10. **Theme Preferences** - No dark mode or theme switching
+11. **Email Verification on Signup** - Supabase handles this but not explicitly tested
+12. **Hamburger Menu for Mobile** - Mobile responsive but no hamburger menu yet
+
+### Partially Implemented:
+- **Onboarding Tutorial** - Components exist but may not trigger automatically
+- **Pull-to-Refresh** - Depends on browser support
+- **Social Sharing** - Share button exists but full social media integration unclear
 
 ---
 
@@ -698,24 +769,47 @@ When you find issues, please provide:
 
 The application is ready for production when:
 
-✅ All critical path features work without errors  
-✅ No console errors in normal usage  
-✅ Mobile experience is smooth and usable  
-✅ Performance is acceptable (page loads < 3 sec)  
+✅ All **Critical Path** features work without errors  
+✅ No console errors during normal usage  
+✅ Mobile experience is smooth on 320px, 375px, and 768px widths  
+✅ Performance is acceptable (page loads < 3 seconds on good connection)  
 ✅ Authentication & authorization work correctly  
-✅ No data loss or corruption  
-✅ Error messages are user-friendly  
-✅ UI is polished and consistent  
+✅ No data loss or corruption during normal operations  
+✅ Error messages are user-friendly (no stack traces shown)  
+✅ UI is polished and uses correct color palette  
+✅ All 4 profile tabs load correctly on initial visit  
+✅ Inline playlist creation works in both scenarios (no playlists, existing playlists)  
 
 ---
 
-## 📞 Support
+## 📞 How to Report Issues
 
-If you encounter issues during testing:
-1. Check browser console for errors
-2. Check backend logs for API errors
-3. Document using bug report template above
-4. Report to development team
+1. **Check browser console** (F12) for errors
+2. **Check Network tab** (F12 → Network) for failed API calls
+3. **Check backend logs** in your terminal for server errors
+4. **Document** using the bug report template above
+5. **Include screenshots/videos** if helpful
+6. **Note environment** (browser, device, screen size)
 
-Happy Testing! 🚀
+---
 
+## 🚀 Testing Priority Order
+
+**Test in this order for efficiency:**
+
+1. **Authentication** (must work first)
+2. **Search & Video Playback** (core feature)
+3. **Comments** (key engagement feature)
+4. **Playlists** (including new inline creation)
+5. **Profile Tabs** (all 4 tabs)
+6. **Follow/Feed** (social features)
+7. **Mobile Responsiveness**
+8. **Push Notifications**
+9. **PWA Features**
+10. **Edge Cases & Error Handling**
+
+---
+
+**Happy Testing! 🎉**
+
+Last Updated: November 17, 2025
