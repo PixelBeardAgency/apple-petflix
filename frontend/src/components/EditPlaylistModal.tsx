@@ -11,6 +11,9 @@ interface Playlist {
   name: string;
   description: string | null;
   is_public: boolean;
+  user_id?: string;
+  created_at?: string;
+  videos?: any[];
 }
 
 interface EditPlaylistModalProps {
@@ -45,7 +48,11 @@ export function EditPlaylistModal({ playlist, onClose, onUpdate }: EditPlaylistM
         isPublic
       );
 
-      onUpdate(updated);
+      // Merge the updated fields with existing playlist data
+      onUpdate({
+        ...playlist,
+        ...updated,
+      });
       onClose();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update playlist');
