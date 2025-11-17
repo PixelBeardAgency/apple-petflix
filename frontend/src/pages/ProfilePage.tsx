@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { followService } from '../services/follow';
 import { videoService } from '../services/video';
 import { playlistService } from '../services/playlist';
+import { profileService } from '../services/profile';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -14,13 +15,17 @@ import { SharedVideoCard } from '../components/SharedVideoCard';
 import { EmptyState } from '../components/EmptyState';
 import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
 import type { Video, Playlist, Profile } from '../types';
-import { Video as VideoIcon, List, Users, UserPlus } from 'lucide-react';
+import { Video as VideoIcon, List, Users, UserPlus, Upload, X } from 'lucide-react';
 
 export function ProfilePage() {
   const navigate = useNavigate();
   const { user, profile, signOut, updateProfile } = useAuth();
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
@@ -121,6 +126,40 @@ export function ProfilePage() {
     navigate('/');
   };
 
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Image must be smaller than 2MB');
+      return;
+    }
+
+    setSelectedFile(file);
+    // Create preview URL
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setPreviewUrl(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+    setError(null);
+  };
+
+  const handleRemoveFile = () => {
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -141,10 +180,33 @@ export function ProfilePage() {
     }
 
     try {
+      let profilePictureUrl = formData.profile_picture_url;
+
+      // If a file was selected, upload it first
+      if (selectedFile && user?.id) {
+        setUploading(true);
+        try {
+          // Delete old picture if it exists and is from storage
+          if (profile?.profile_picture_url && profile.profile_picture_url.includes('/avatars/')) {
+            await profileService.deleteProfilePicture(profile.profile_picture_url);
+          }
+
+          // Upload new picture
+          profilePictureUrl = await profileService.uploadProfilePicture(selectedFile, user.id);
+        } catch (uploadError) {
+          setError(uploadError instanceof Error ? uploadError.message : 'Failed to upload image');
+          setLoading(false);
+          setUploading(false);
+          return;
+        } finally {
+          setUploading(false);
+        }
+      }
+
       const { error } = await updateProfile({
         username: formData.username,
         bio: formData.bio || undefined,
-        profile_picture_url: formData.profile_picture_url || undefined,
+        profile_picture_url: profilePictureUrl || undefined,
       });
 
       if (error) {
@@ -152,6 +214,8 @@ export function ProfilePage() {
       } else {
         setSuccess(true);
         setEditing(false);
+        setSelectedFile(null);
+        setPreviewUrl(null);
         setTimeout(() => setSuccess(false), 3000);
       }
     } catch (err) {
@@ -167,6 +231,8 @@ export function ProfilePage() {
       bio: profile?.bio || '',
       profile_picture_url: profile?.profile_picture_url || '',
     });
+    setSelectedFile(null);
+    setPreviewUrl(null);
     setEditing(false);
     setError(null);
   };
@@ -230,24 +296,87 @@ export function ProfilePage() {
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="profile_picture_url" className="text-sm sm:text-base">Profile Picture URL</Label>
-                  <Input
-                    id="profile_picture_url"
-                    type="url"
-                    value={formData.profile_picture_url}
-                    onChange={(e) =>
-                      setFormData({ ...formData, profile_picture_url: e.target.value })
-                    }
-                    disabled={loading}
-                    placeholder="https://example.com/avatar.jpg"
-                    className="text-sm sm:text-base"
-                  />
+                <div className="space-y-4">
+                  <Label className="text-sm sm:text-base">Profile Picture</Label>
+                  
+                  {/* File Upload Option */}
+                  <div className="space-y-2">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleFileSelect}
+                      disabled={loading || uploading}
+                      className="hidden"
+                    />
+                    
+                    {/* Preview or Upload Button */}
+                    {previewUrl || selectedFile ? (
+                      <div className="relative inline-block">
+                        <img
+                          src={previewUrl || ''}
+                          alt="Preview"
+                          className="w-32 h-32 rounded-full object-cover border-2 border-primary"
+                        />
+                        <button
+                          type="button"
+                          onClick={handleRemoveFile}
+                          disabled={loading || uploading}
+                          className="absolute top-0 right-0 p-1 bg-destructive text-destructive-foreground rounded-full hover:bg-destructive/90 transition-colors"
+                        >
+                          <X className="h-4 w-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={loading || uploading}
+                        className="w-full sm:w-auto"
+                      >
+                        <Upload className="h-4 w-4 mr-2" />
+                        Upload Image
+                      </Button>
+                    )}
+                    
+                    <p className="text-xs text-muted-foreground">
+                      JPG, PNG, or GIF. Max 2MB.
+                    </p>
+                  </div>
+
+                  {/* OR Divider */}
+                  <div className="flex items-center space-x-2">
+                    <div className="flex-1 border-t border-border"></div>
+                    <span className="text-xs text-muted-foreground">OR</span>
+                    <div className="flex-1 border-t border-border"></div>
+                  </div>
+
+                  {/* URL Option */}
+                  <div className="space-y-2">
+                    <Label htmlFor="profile_picture_url" className="text-sm">Use Image URL</Label>
+                    <Input
+                      id="profile_picture_url"
+                      type="url"
+                      value={formData.profile_picture_url}
+                      onChange={(e) =>
+                        setFormData({ ...formData, profile_picture_url: e.target.value })
+                      }
+                      disabled={loading || uploading || selectedFile !== null}
+                      placeholder="https://example.com/avatar.jpg"
+                      className="text-sm sm:text-base"
+                    />
+                    {selectedFile && (
+                      <p className="text-xs text-muted-foreground">
+                        Remove uploaded file to use URL instead
+                      </p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
-                  <Button type="submit" disabled={loading} className="w-full sm:w-auto">
-                    {loading ? 'Saving...' : 'Save Changes'}
+                  <Button type="submit" disabled={loading || uploading} className="w-full sm:w-auto">
+                    {uploading ? 'Uploading...' : loading ? 'Saving...' : 'Save Changes'}
                   </Button>
                   <Button type="button" variant="outline" onClick={handleCancel} disabled={loading} className="w-full sm:w-auto">
                     Cancel

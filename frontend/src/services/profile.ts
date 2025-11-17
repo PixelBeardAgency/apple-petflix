@@ -1,4 +1,5 @@
 import { API_URL } from '../config/api';
+import { supabase } from '../lib/supabase';
 import type { User } from '../types';
 
 class ProfileService {
@@ -77,6 +78,55 @@ class ProfileService {
     }
 
     return response.json();
+  }
+
+  /**
+   * Upload profile picture to Supabase Storage
+   */
+  async uploadProfilePicture(file: File, userId: string): Promise<string> {
+    // Generate a unique filename
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    const filePath = `${userId}/${fileName}`;
+
+    // Upload file to Supabase Storage
+    const { error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, file, {
+        cacheControl: '3600',
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw new Error(`Upload failed: ${uploadError.message}`);
+    }
+
+    // Get public URL
+    const { data } = supabase.storage
+      .from('avatars')
+      .getPublicUrl(filePath);
+
+    return data.publicUrl;
+  }
+
+  /**
+   * Delete old profile picture from storage
+   */
+  async deleteProfilePicture(pictureUrl: string): Promise<void> {
+    try {
+      // Extract file path from URL
+      const urlParts = pictureUrl.split('/avatars/');
+      if (urlParts.length !== 2) return; // Not a storage URL
+
+      const filePath = urlParts[1];
+      
+      await supabase.storage
+        .from('avatars')
+        .remove([filePath]);
+    } catch (error) {
+      // Silently fail - old image cleanup is not critical
+      console.error('Failed to delete old profile picture:', error);
+    }
   }
 }
 
