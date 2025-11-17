@@ -98,18 +98,22 @@ registerRoute(
  * Handle push notification received
  */
 self.addEventListener('push', (event: PushEvent) => {
-  console.log('Push notification received:', event);
+  console.log('[Service Worker] Push notification received:', event);
+  console.log('[Service Worker] Has data:', !!event.data);
 
   if (!event.data) {
-    console.log('Push event but no data');
+    console.log('[Service Worker] Push event but no data');
     return;
   }
 
   let notificationData;
   try {
-    notificationData = event.data.json();
+    const rawData = event.data.text();
+    console.log('[Service Worker] Raw push data:', rawData);
+    notificationData = JSON.parse(rawData);
+    console.log('[Service Worker] Parsed notification data:', notificationData);
   } catch (error) {
-    console.error('Failed to parse push notification data:', error);
+    console.error('[Service Worker] Failed to parse push notification data:', error);
     notificationData = {
       title: 'Petflix',
       body: event.data.text(),
@@ -130,8 +134,16 @@ self.addEventListener('push', (event: PushEvent) => {
     requireInteraction: false,
   } as NotificationOptions;
 
+  console.log('[Service Worker] Showing notification:', title, options);
+
   event.waitUntil(
     self.registration.showNotification(title || 'Petflix', options)
+      .then(() => {
+        console.log('[Service Worker] Notification displayed successfully');
+      })
+      .catch((error) => {
+        console.error('[Service Worker] Failed to show notification:', error);
+      })
   );
 });
 

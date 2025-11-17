@@ -77,12 +77,23 @@ router.post('/:userId/follow', authenticateUser, async (req: AuthRequest, res, n
       .eq('id', followerId)
       .single();
 
-    await supabase.from('notifications').insert({
+    const { error: notificationError } = await supabase.from('notifications').insert({
       user_id: userId,
       type: 'follow',
       content: `New follower`,
       related_user_id: followerId,
     });
+
+    if (notificationError) {
+      logger.error('Failed to create notification for follow', {
+        error: notificationError,
+        userId,
+        followerId,
+      });
+      // Don't throw - notification failure shouldn't block the follow
+    } else {
+      logger.info(`Created follow notification for user ${userId} from ${followerId}`);
+    }
 
     // Send push notification
     sendPushNotification(
