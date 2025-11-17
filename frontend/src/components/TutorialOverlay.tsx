@@ -142,26 +142,64 @@ export function TutorialOverlay({
 
   return (
     <>
-      {/* Overlay backdrop */}
-      <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={onSkip} />
+      {/* Overlay backdrop with blur - but with a cutout for the highlighted element */}
+      {targetPosition ? (
+        <>
+          {/* Create 4 blurred rectangles around the highlighted element to avoid blurring it */}
+          {/* Top rectangle */}
+          <div 
+            className="fixed z-50 bg-black/60 backdrop-blur-sm pointer-events-none"
+            style={{
+              top: 0,
+              left: 0,
+              right: 0,
+              height: targetPosition.top - 8,
+            }}
+          />
+          {/* Bottom rectangle */}
+          <div 
+            className="fixed z-50 bg-black/60 backdrop-blur-sm pointer-events-none"
+            style={{
+              top: targetPosition.bottom + 8,
+              left: 0,
+              right: 0,
+              bottom: 0,
+            }}
+          />
+          {/* Left rectangle */}
+          <div 
+            className="fixed z-50 bg-black/60 backdrop-blur-sm pointer-events-none"
+            style={{
+              top: targetPosition.top - 8,
+              left: 0,
+              width: targetPosition.left - 8,
+              height: targetPosition.height + 16,
+            }}
+          />
+          {/* Right rectangle */}
+          <div 
+            className="fixed z-50 bg-black/60 backdrop-blur-sm pointer-events-none"
+            style={{
+              top: targetPosition.top - 8,
+              left: targetPosition.right + 8,
+              right: 0,
+              height: targetPosition.height + 16,
+            }}
+          />
+          {/* Clickable overlay for skip */}
+          <div 
+            className="fixed inset-0 z-50 bg-transparent"
+            onClick={onSkip}
+            style={{ pointerEvents: 'auto' }}
+          />
+        </>
+      ) : (
+        /* Full screen blur when no target */
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50" onClick={onSkip} />
+      )}
 
       {/* Highlight box (if target exists) */}
       {targetPosition && <div style={highlightStyle} />}
-
-      {/* Spotlight effect */}
-      {targetPosition && (
-        <div
-          className="fixed z-50 pointer-events-none"
-          style={{
-            top: targetPosition.top - 8,
-            left: targetPosition.left - 8,
-            width: targetPosition.width + 16,
-            height: targetPosition.height + 16,
-            boxShadow: '0 0 0 9999px rgba(0, 0, 0, 0.6)',
-            borderRadius: '8px',
-          }}
-        />
-      )}
 
       {/* Tutorial card */}
       <div style={tooltipStyle}>
