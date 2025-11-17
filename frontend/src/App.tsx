@@ -176,6 +176,14 @@ function AppRoutes() {
         }
       />
       <Route
+        path="/profile/:userId"
+        element={
+          <ProtectedRoute>
+            <ProfilePage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
         path="/share"
         element={
           <ProtectedRoute>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { followService } from '../services/follow';
 import { videoService } from '../services/video';
@@ -14,13 +14,15 @@ import { Header } from '../components/Header';
 import { SharedVideoCard } from '../components/SharedVideoCard';
 import { EmptyState } from '../components/EmptyState';
 import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
-import type { Video, Playlist, Profile } from '../types';
+import type { Video, Playlist, Profile, User } from '../types';
 import { Video as VideoIcon, List, Users, UserPlus, Upload, X } from 'lucide-react';
 
 export function ProfilePage() {
   const navigate = useNavigate();
-  const { user, profile, signOut, updateProfile } = useAuth();
+  const { userId } = useParams<{ userId?: string }>();
+  const { user, profile: currentUserProfile, signOut, updateProfile } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [viewedProfile, setViewedProfile] = useState<User | null>(null);
   const [editing, setEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
@@ -30,6 +32,12 @@ export function ProfilePage() {
   const [success, setSuccess] = useState(false);
   const [followerCount, setFollowerCount] = useState(0);
   const [followingCount, setFollowingCount] = useState(0);
+  const [isFollowing, setIsFollowing] = useState(false);
+
+  // Determine which profile to display
+  const profile = viewedProfile || currentUserProfile;
+  const isOwnProfile = !userId || userId === user?.id;
+
   const [formData, setFormData] = useState({
     username: profile?.username || '',
     bio: profile?.bio || '',
@@ -45,6 +53,33 @@ export function ProfilePage() {
   const [loadingPlaylists, setLoadingPlaylists] = useState(false);
   const [loadingFollowers, setLoadingFollowers] = useState(false);
   const [loadingFollowing, setLoadingFollowing] = useState(false);
+
+  // Load viewed user's profile if userId is provided
+  useEffect(() => {
+    const loadUserProfile = async () => {
+      if (userId && userId !== user?.id) {
+        setLoading(true);
+        try {
+          const userProfile = await profileService.getProfile(userId);
+          setViewedProfile(userProfile);
+          
+          // Check if current user is following this profile
+          if (user?.id) {
+            const followStatus = await followService.getFollowStatus(userId);
+            setIsFollowing(followStatus);
+          }
+        } catch (err) {
+          setError(err instanceof Error ? err.message : 'Failed to load profile');
+        } finally {
+          setLoading(false);
+        }
+      } else {
+        setViewedProfile(null);
+      }
+    };
+
+    loadUserProfile();
+  }, [userId, user?.id]);
 
   useEffect(() => {
     if (profile?.id) {
@@ -66,6 +101,29 @@ export function ProfilePage() {
       setFollowingCount(following.total);
     } catch (error) {
       console.error('Failed to load follow counts:', error);
+    }
+  };
+
+  const handleFollowToggle = async () => {
+    if (!userId || !user?.id) return;
+    
+    setLoading(true);
+    setError(null);
+    
+    try {
+      if (isFollowing) {
+        await followService.unfollowUser(userId);
+        setIsFollowing(false);
+        setFollowerCount(prev => Math.max(0, prev - 1));
+      } else {
+        await followService.followUser(userId);
+        setIsFollowing(true);
+        setFollowerCount(prev => prev + 1);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to update follow status');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -416,7 +474,17 @@ export function ProfilePage() {
                   Member since {new Date(profile.created_at).toLocaleDateString()}
                 </div>
 
-                <Button onClick={() => setEditing(true)} className="w-full sm:w-auto">Edit Profile</Button>
+                {isOwnProfile ? (
+                  <Button onClick={() => setEditing(true)} className="w-full sm:w-auto">Edit Profile</Button>
+                ) : (
+                  <Button 
+                    onClick={handleFollowToggle}
+                    variant={isFollowing ? 'outline' : 'default'}
+                    className="w-full sm:w-auto"
+                  >
+                    {isFollowing ? 'Unfollow' : 'Follow'}
+                  </Button>
+                )}
               </div>
             )}
           </CardContent>
