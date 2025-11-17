@@ -4,9 +4,11 @@ import { playlistService } from '../services/playlist';
 import { tagService } from '../services/tag';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
+import { EditPlaylistModal } from '../components/EditPlaylistModal';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
+import { Edit2 } from 'lucide-react';
 
 interface Playlist {
   id: string;
@@ -27,6 +29,7 @@ export function PlaylistDetailPage() {
   const [tags, setTags] = useState<any[]>([]);
   const [addingTagFor, setAddingTagFor] = useState<string | null>(null);
   const [newTagName, setNewTagName] = useState('');
+  const [showEditModal, setShowEditModal] = useState(false);
 
   useEffect(() => {
     if (playlistId) {
@@ -104,6 +107,10 @@ export function PlaylistDetailPage() {
     }
   };
 
+  const handleUpdatePlaylist = (updated: Playlist) => {
+    setPlaylist(updated);
+  };
+
   const isOwner = user?.id === playlist?.user_id;
 
   return (
@@ -137,9 +144,20 @@ export function PlaylistDetailPage() {
                       {playlist.videos.length} video{playlist.videos.length !== 1 ? 's' : ''}
                     </p>
                   </div>
-                  <Link to="/playlists">
-                    <Button variant="outline">Back to Playlists</Button>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    {isOwner && (
+                      <Button
+                        variant="outline"
+                        onClick={() => setShowEditModal(true)}
+                      >
+                        <Edit2 className="h-4 w-4 mr-2" />
+                        Edit
+                      </Button>
+                    )}
+                    <Link to="/playlists">
+                      <Button variant="outline">Back to Playlists</Button>
+                    </Link>
+                  </div>
                 </div>
 
                 {playlist.description && (
@@ -303,6 +321,15 @@ export function PlaylistDetailPage() {
           )}
         </div>
       </main>
+
+      {/* Edit Playlist Modal */}
+      {showEditModal && playlist && (
+        <EditPlaylistModal
+          playlist={playlist}
+          onClose={() => setShowEditModal(false)}
+          onUpdate={handleUpdatePlaylist}
+        />
+      )}
     </div>
   );
 }
