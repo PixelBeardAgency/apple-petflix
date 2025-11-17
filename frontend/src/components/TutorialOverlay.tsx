@@ -38,6 +38,12 @@ export function TutorialOverlay({
         const rect = element.getBoundingClientRect();
         setTargetPosition(rect);
         
+        // Remove blur from highlighted element and its children
+        const htmlElement = element as HTMLElement;
+        htmlElement.style.filter = 'none';
+        htmlElement.style.position = 'relative';
+        htmlElement.style.zIndex = '65'; // Above the backdrop (z-50) and spotlight (z-50)
+        
         // Highlight style
         setHighlightStyle({
           position: 'fixed',
@@ -62,6 +68,19 @@ export function TutorialOverlay({
     } else {
       setCenterPosition();
     }
+
+    // Cleanup function to restore blur when component unmounts or step changes
+    return () => {
+      if (step.target) {
+        const element = document.querySelector(step.target);
+        if (element) {
+          const htmlElement = element as HTMLElement;
+          htmlElement.style.filter = '';
+          htmlElement.style.position = '';
+          htmlElement.style.zIndex = '';
+        }
+      }
+    };
   }, [step, isCenterStep]);
 
   const setCenterPosition = () => {
