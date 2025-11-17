@@ -70,57 +70,44 @@ export function FeedPage() {
           )}
 
           {!loading && videos.length > 0 && (
-            <div className="space-y-4 sm:space-y-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {videos.map((video) => (
-                <Card key={video.id} className="overflow-hidden">
-                  <div className="flex flex-col md:flex-row">
-                    <div className="w-full md:w-1/3">
+                <Link key={video.id} to={`/video/${video.id}`}>
+                  <Card className="overflow-hidden hover-lift fade-in cursor-pointer h-full">
+                    <div className="relative aspect-video">
                       <img
-                        src={video.thumbnail_url || 'https://via.placeholder.com/320x180'}
+                        src={video.thumbnail_url || 'https://via.placeholder.com/480x360?text=No+Thumbnail'}
                         alt={video.title}
-                        className="w-full h-48 md:h-full object-cover"
+                        className="w-full h-full object-cover"
                       />
                     </div>
-                    <div className="w-full md:w-2/3">
-                      <CardHeader className="p-4 sm:p-6">
-                        <CardTitle className="text-base sm:text-lg">{video.title}</CardTitle>
-                        <CardDescription className="text-xs sm:text-sm">
-                          Shared by{' '}
-                          <Link
-                            to={`/user/${video.user_id}`}
-                            className="hover:underline font-medium"
-                          >
-                            {(video as any).user?.username || 'Unknown'}
-                          </Link>{' '}
-                          •{' '}
-                          {new Date(video.created_at).toLocaleDateString()}
-                        </CardDescription>
-                      </CardHeader>
-                      <CardContent className="p-4 pt-0 sm:p-6 sm:pt-0">
-                        {video.description && (
-                          <p className="text-xs sm:text-sm text-muted-foreground line-clamp-2 mb-3 sm:mb-4">
-                            {video.description}
-                          </p>
-                        )}
-                        <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2">
-                          <a
-                            href={`https://www.youtube.com/watch?v=${video.youtube_video_id}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex-1 sm:flex-none"
-                          >
-                            <Button size="sm" className="w-full sm:w-auto text-xs sm:text-sm">Watch on YouTube</Button>
-                          </a>
-                          <Link to={`/video/${video.id}`} className="flex-1 sm:flex-none">
-                            <Button size="sm" variant="outline" className="w-full sm:w-auto text-xs sm:text-sm">
-                              View Comments
-                            </Button>
-                          </Link>
-                        </div>
+                    <CardHeader className="p-4">
+                      <CardTitle className="text-base line-clamp-2">
+                        {video.title}
+                      </CardTitle>
+                      <CardDescription className="text-xs mt-1">
+                        Shared by{' '}
+                        <Link
+                          to={`/profile/${video.user_id}`}
+                          className="hover:underline font-medium"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          {(video as any).user?.username || 'Unknown'}
+                        </Link>
+                      </CardDescription>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {new Date(video.created_at).toLocaleDateString()}
+                      </p>
+                    </CardHeader>
+                    {video.description && (
+                      <CardContent className="p-4 pt-0">
+                        <p className="text-xs text-muted-foreground line-clamp-2">
+                          {video.description}
+                        </p>
                       </CardContent>
-                    </div>
-                  </div>
-                </Card>
+                    )}
+                  </Card>
+                </Link>
               ))}
             </div>
           )}

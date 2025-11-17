@@ -213,7 +213,7 @@ export function SearchPage() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                     {videos.map((video) => (
-                      <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+                      <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
                         <div 
                           className="relative aspect-video cursor-pointer group"
                           onClick={() => setPreviewVideo(video)}
@@ -230,7 +230,7 @@ export function SearchPage() {
                             </div>
                           </div>
                         </div>
-                        <CardHeader>
+                        <CardHeader className="flex-shrink-0">
                           <CardTitle className="text-base line-clamp-2">
                             {video.title}
                           </CardTitle>
@@ -238,7 +238,7 @@ export function SearchPage() {
                             {video.channelTitle}
                           </CardDescription>
                         </CardHeader>
-                        <CardContent>
+                        <CardContent className="flex-1 flex flex-col justify-between">
                           <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
                             {video.description}
                           </p>
