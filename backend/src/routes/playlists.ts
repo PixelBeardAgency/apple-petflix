@@ -29,7 +29,7 @@ router.get('/', authenticateUser, async (req: AuthRequest, res, next) => {
 
     const { data, error, count } = await supabase
       .from('playlists')
-      .select('*', { count: 'exact' })
+      .select('*, video_count', { count: 'exact' })
       .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .range(parseInt(offset as string), parseInt(offset as string) + parseInt(limit as string) - 1);
@@ -38,8 +38,14 @@ router.get('/', authenticateUser, async (req: AuthRequest, res, next) => {
       throw new AppError(error.message, 500);
     }
 
+    // Ensure video_count is never null
+    const playlistsWithCount = (data || []).map(playlist => ({
+      ...playlist,
+      video_count: playlist.video_count ?? 0,
+    }));
+
     res.json({
-      playlists: data,
+      playlists: playlistsWithCount,
       total: count,
       limit: parseInt(limit as string),
       offset: parseInt(offset as string),
