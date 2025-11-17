@@ -203,25 +203,12 @@ self.addEventListener('notificationclose', (event: NotificationEvent) => {
  * Handle push subscription change
  */
 self.addEventListener('pushsubscriptionchange', (event: any) => {
-  console.log('Push subscription changed:', event);
-
-  event.waitUntil(
-    self.registration.pushManager
-      .subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: event.oldSubscription?.options.applicationServerKey,
-      })
-      .then((subscription) => {
-        console.log('Re-subscribed to push notifications:', subscription);
-        
-        // Send new subscription to backend
-        // This would need the auth token which we don't have in SW context
-        // The app should detect this and re-subscribe
-      })
-      .catch((error) => {
-        console.error('Failed to re-subscribe:', error);
-      })
-  );
+  console.log('[Service Worker] Push subscription changed:', event);
+  
+  // Note: We can't re-subscribe here because we don't have access to the VAPID key
+  // or auth token in the service worker context.
+  // The application should detect this and prompt the user to re-enable notifications.
+  console.log('[Service Worker] Subscription changed - user should re-enable notifications in app');
 });
 
 // Skip waiting and claim clients

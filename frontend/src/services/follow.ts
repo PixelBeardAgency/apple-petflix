@@ -40,8 +40,17 @@ export class FollowService {
     });
 
     if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.error?.message || 'Failed to unfollow user');
+      // Only try to parse JSON if there's content
+      if (response.status !== 204) {
+        try {
+          const error = await response.json();
+          throw new Error(error.error?.message || 'Failed to unfollow user');
+        } catch {
+          throw new Error('Failed to unfollow user');
+        }
+      } else {
+        throw new Error('Failed to unfollow user');
+      }
     }
   }
 

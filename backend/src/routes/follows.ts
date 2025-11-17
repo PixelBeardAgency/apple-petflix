@@ -44,12 +44,18 @@ router.post('/:userId/follow', authenticateUser, async (req: AuthRequest, res, n
     }
 
     // Check if already following
-    const { data: existing } = await supabase
+    const { data: existing, error: checkError } = await supabase
       .from('followers')
       .select('*')
       .eq('follower_id', followerId)
       .eq('following_id', userId)
-      .single();
+      .maybeSingle();
+
+    // Ignore "PGRST116" error (no rows found) - that's what we want
+    if (checkError && checkError.code !== 'PGRST116') {
+      logger.error('Error checking follow status', { checkError, followerId, userId });
+      throw new AppError(checkError.message, 500);
+    }
 
     if (existing) {
       throw new AppError('Already following this user', 409);

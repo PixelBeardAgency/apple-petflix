@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { notificationService } from '../services/notification';
 import { Button } from './ui/button';
 import {
@@ -27,6 +27,7 @@ interface Notification {
 }
 
 export function NotificationBell() {
+  const navigate = useNavigate();
   const [unreadCount, setUnreadCount] = useState(0);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showDropdown, setShowDropdown] = useState(false);
@@ -89,6 +90,27 @@ export function NotificationBell() {
     }
   };
 
+  const getNotificationLink = (notification: Notification): string => {
+    // Navigate to related video if present
+    if (notification.related_video) {
+      return `/video/${notification.related_video.id}`;
+    }
+    // Navigate to related user's profile if present
+    if (notification.related_user) {
+      return `/profile/${notification.related_user.id}`;
+    }
+    // Default to notifications page
+    return '/notifications';
+  };
+
+  const handleNotificationClick = (notification: Notification) => {
+    if (!notification.read) {
+      handleMarkAsRead(notification.id);
+    }
+    setShowDropdown(false);
+    navigate(getNotificationLink(notification));
+  };
+
   return (
     <div className="relative">
       <Button
@@ -144,12 +166,7 @@ export function NotificationBell() {
                     className={`p-4 border-b border-border hover:bg-muted/50 cursor-pointer ${
                       !notification.read ? 'bg-primary/5' : ''
                     }`}
-                    onClick={() => {
-                      if (!notification.read) {
-                        handleMarkAsRead(notification.id);
-                      }
-                      setShowDropdown(false);
-                    }}
+                    onClick={() => handleNotificationClick(notification)}
                   >
                     <div className="flex items-start space-x-3">
                       {notification.related_user && (
@@ -165,7 +182,14 @@ export function NotificationBell() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-foreground">
                           {notification.related_user && (
-                            <span className="font-semibold">
+                            <span
+                              className="font-semibold hover:underline cursor-pointer text-primary"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setShowDropdown(false);
+                                navigate(`/profile/${notification.related_user!.id}`);
+                              }}
+                            >
                               {notification.related_user.username}
                             </span>
                           )}{' '}
