@@ -4,7 +4,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Label } from './ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Plus } from 'lucide-react';
+import { Plus, Check } from 'lucide-react';
 
 interface Playlist {
   id: string;
@@ -20,6 +20,7 @@ interface AddToPlaylistModalProps {
 
 export function AddToPlaylistModal({ videoId, onClose }: AddToPlaylistModalProps) {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
+  const [playlistsWithVideo, setPlaylistsWithVideo] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [adding, setAdding] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -28,14 +29,18 @@ export function AddToPlaylistModal({ videoId, onClose }: AddToPlaylistModalProps
   const [newPlaylistName, setNewPlaylistName] = useState('');
 
   useEffect(() => {
-    loadPlaylists();
+    loadData();
   }, []);
 
-  const loadPlaylists = async () => {
+  const loadData = async () => {
     setLoading(true);
     try {
-      const result = await playlistService.getPlaylists(100, 0);
-      setPlaylists(result.playlists);
+      const [playlistsResult, playlistIdsWithVideo] = await Promise.all([
+        playlistService.getPlaylists(100, 0),
+        playlistService.checkVideoInPlaylists(videoId)
+      ]);
+      setPlaylists(playlistsResult.playlists);
+      setPlaylistsWithVideo(playlistIdsWithVideo);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load playlists');
     } finally {
@@ -167,21 +172,38 @@ export function AddToPlaylistModal({ videoId, onClose }: AddToPlaylistModalProps
               <div className="space-y-4">
                 {/* Existing playlists */}
                 <div className="space-y-2">
-                  {playlists.map((playlist) => (
-                    <button
-                      key={playlist.id}
-                      onClick={() => handleAddToPlaylist(playlist.id, playlist.name)}
-                      disabled={adding === playlist.id}
-                      className="w-full text-left p-3 rounded-md border border-border hover:bg-muted transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      <div className="font-medium text-foreground">{playlist.name}</div>
-                      {playlist.description && (
-                        <div className="text-sm text-muted-foreground line-clamp-1">
-                          {playlist.description}
+                  {playlists.map((playlist) => {
+                    const hasVideo = playlistsWithVideo.includes(playlist.id);
+                    return (
+                      <button
+                        key={playlist.id}
+                        onClick={() => !hasVideo && handleAddToPlaylist(playlist.id, playlist.name)}
+                        disabled={adding === playlist.id || hasVideo}
+                        className={`w-full text-left p-3 rounded-md border transition-colors ${
+                          hasVideo
+                            ? 'border-primary bg-primary/10 cursor-default'
+                            : 'border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <div className="font-medium text-foreground">{playlist.name}</div>
+                            {playlist.description && (
+                              <div className="text-sm text-muted-foreground line-clamp-1">
+                                {playlist.description}
+                              </div>
+                            )}
+                          </div>
+                          {hasVideo && (
+                            <div className="flex items-center gap-2 text-primary ml-2">
+                              <Check className="w-4 h-4" />
+                              <span className="text-sm font-medium">Added</span>
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </button>
-                  ))}
+                      </button>
+                    );
+                  })}
                 </div>
 
                 {/* Create new playlist section */}

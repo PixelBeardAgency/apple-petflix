@@ -359,5 +359,41 @@ router.delete('/:playlistId/videos/:videoId', authenticateUser, async (req: Auth
   }
 });
 
+/**
+ * GET /api/playlists/check/:videoId
+ * Check which of user's playlists contain a specific video
+ */
+router.get('/check/:videoId', authenticateUser, async (req: AuthRequest, res, next) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.user!.id;
+
+    // Get all user's playlists
+    const { data: playlists } = await supabase
+      .from('playlists')
+      .select('id')
+      .eq('user_id', userId);
+
+    if (!playlists || playlists.length === 0) {
+      return res.json({ playlistIds: [] });
+    }
+
+    const playlistIds = playlists.map(p => p.id);
+
+    // Check which playlists contain this video
+    const { data: playlistVideos } = await supabase
+      .from('playlist_videos')
+      .select('playlist_id')
+      .eq('video_id', videoId)
+      .in('playlist_id', playlistIds);
+
+    const playlistIdsWithVideo = (playlistVideos || []).map(pv => pv.playlist_id);
+
+    res.json({ playlistIds: playlistIdsWithVideo });
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;
 

@@ -110,6 +110,29 @@ export class PlaylistService {
     }
   }
 
+  /**
+   * Check which playlists contain a specific video
+   */
+  async checkVideoInPlaylists(videoId: string): Promise<string[]> {
+    const token = await this.getAuthToken();
+    if (!token) {
+      throw new Error('You must be logged in');
+    }
+
+    const response = await fetch(`${API_URL}/api/playlists/check/${videoId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to check playlists');
+    }
+
+    const data = await response.json();
+    return data.playlistIds;
+  }
+
   async addVideo(playlistId: string, videoId: string) {
     const token = await this.getAuthToken();
     if (!token) {
