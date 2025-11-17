@@ -44,6 +44,30 @@ This document provides a comprehensive testing checklist for all **implemented**
 - [ ] Verify session is cleared
 - [ ] Try accessing protected routes (should redirect to login)
 
+### Password Reset Flow
+- [ ] Navigate to login page
+- [ ] Click "Forgot password?" link
+- [ ] Enter email address
+- [ ] Submit form
+- [ ] Verify success message: "Check Your Email"
+- [ ] Check email inbox for reset link (or check Supabase email logs)
+- [ ] Click reset link in email
+- [ ] Redirected to `/reset-password` page
+- [ ] Enter new password (min 6 characters)
+- [ ] Confirm new password
+- [ ] Submit form
+- [ ] Verify success message: "Password Reset Successful!"
+- [ ] Auto-redirect to login page
+- [ ] Login with new password
+- [ ] Verify login successful
+
+### Password Reset Edge Cases
+- [ ] Try reset with invalid email → Should send email anyway (security best practice)
+- [ ] Try accessing reset page without token → Shows error message
+- [ ] Try password < 6 characters → Validation error
+- [ ] Try mismatched passwords → Validation error
+- [ ] Click "try again" on success page → Returns to email input form
+
 ### Invalid Login
 - [ ] Enter wrong password
 - [ ] Verify error message displays
@@ -705,6 +729,7 @@ When you find issues, please provide:
 ### Critical Path (Must Work Perfectly)
 - [ ] User registration
 - [ ] User login/logout
+- [ ] Password reset flow (forgot password → email → reset → login)
 - [ ] Video search with YouTube API
 - [ ] Video playback
 - [ ] Comment creation and deletion
@@ -742,10 +767,10 @@ When you find issues, please provide:
 
 ## ⚠️ Known Limitations & Future Features
 
-The following features are **NOT currently implemented** but were mentioned in the PRD:
+The following features are **NOT currently implemented** but were mentioned in the PRD or are planned for future:
 
 ### Not Implemented:
-1. **Password Reset Flow** - "Forgot Password" link exists but full flow not implemented
+1. ~~**Password Reset Flow**~~ ✅ **NOW IMPLEMENTED!** (Complete flow with email → reset link → new password)
 2. **Threaded Comment Replies** - Comments exist but no nested/threaded replies
 3. **Video Categories/Filters** - No category filtering on search/feed
 4. **Trending Section** - No trending videos page
