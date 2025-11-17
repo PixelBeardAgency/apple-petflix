@@ -189,13 +189,20 @@ export function NotificationBell() {
               </div>
             )}
 
-            <div className="p-4 text-center border-t border-border">
+            <div className="p-4 text-center border-t border-border space-y-2">
               <Link
                 to="/notifications"
-                className="text-sm text-primary hover:underline"
+                className="block text-sm text-primary hover:underline"
                 onClick={() => setShowDropdown(false)}
               >
                 View all notifications
+              </Link>
+              <Link
+                to="/notification-settings"
+                className="block text-sm text-muted-foreground hover:text-primary hover:underline"
+                onClick={() => setShowDropdown(false)}
+              >
+                Notification Settings
               </Link>
             </div>
           </div>

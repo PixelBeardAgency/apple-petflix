@@ -24,6 +24,7 @@ const VideoDetailPage = lazy(() => import('./pages/VideoDetailPage').then(m => (
 const PlaylistsPage = lazy(() => import('./pages/PlaylistsPage').then(m => ({ default: m.PlaylistsPage })));
 const PlaylistDetailPage = lazy(() => import('./pages/PlaylistDetailPage').then(m => ({ default: m.PlaylistDetailPage })));
 const ModerationPage = lazy(() => import('./pages/ModerationPage').then(m => ({ default: m.ModerationPage })));
+const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 const NotificationSettingsPage = lazy(() => import('./pages/NotificationSettingsPage').then(m => ({ default: m.NotificationSettingsPage })));
 
 // Loading component for Suspense fallback
@@ -204,6 +205,22 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <ModerationPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notifications"
+        element={
+          <ProtectedRoute>
+            <NotificationsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/notification-settings"
+        element={
+          <ProtectedRoute>
+            <NotificationSettingsPage />
           </ProtectedRoute>
         }
       />
