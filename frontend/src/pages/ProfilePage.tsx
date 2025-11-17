@@ -308,9 +308,6 @@ export function ProfilePage() {
         <Card>
           <CardHeader>
             <CardTitle className="text-xl sm:text-2xl">My Profile</CardTitle>
-            <CardDescription className="text-sm">
-              {editing ? 'Update your profile information' : 'View your profile'}
-            </CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
