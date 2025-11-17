@@ -55,7 +55,12 @@ export function AddToPlaylistModal({ videoId, onClose }: AddToPlaylistModalProps
         onClose();
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to add to playlist');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add to playlist';
+      if (errorMessage.includes('already in playlist') || errorMessage.includes('409')) {
+        setError(`Video is already in "${playlistName}"`);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setAdding(null);
     }
