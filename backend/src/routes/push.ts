@@ -24,6 +24,16 @@ const vapidPublicKey = process.env.VAPID_PUBLIC_KEY || '';
 const vapidPrivateKey = process.env.VAPID_PRIVATE_KEY || '';
 const vapidSubject = process.env.VAPID_SUBJECT || 'mailto:support@petflix.app';
 
+// Validate VAPID keys are configured
+if (!vapidPublicKey || !vapidPrivateKey) {
+  logger.error('VAPID keys not configured!', {
+    hasPublicKey: !!vapidPublicKey,
+    hasPrivateKey: !!vapidPrivateKey,
+  });
+} else {
+  logger.info('VAPID keys configured successfully');
+}
+
 webpush.setVapidDetails(vapidSubject, vapidPublicKey, vapidPrivateKey);
 
 /**
@@ -172,6 +182,8 @@ router.post('/test', authenticateUser, async (req: AuthRequest, res, next) => {
   try {
     const userId = req.user!.id;
 
+    logger.info(`Test notification requested by user ${userId}`);
+
     // Get user subscriptions
     const { data: subscriptions, error } = await supabase
       .from('push_subscriptions')
@@ -183,8 +195,10 @@ router.post('/test', authenticateUser, async (req: AuthRequest, res, next) => {
       throw new AppError('Failed to send notification', 500);
     }
 
+    logger.info(`Found ${subscriptions?.length || 0} subscriptions for user ${userId}`);
+
     if (!subscriptions || subscriptions.length === 0) {
-      throw new AppError('No active subscriptions', 400);
+      throw new AppError('No active subscriptions found. Please enable push notifications first.', 400);
     }
 
     const payload = JSON.stringify({
@@ -195,32 +209,59 @@ router.post('/test', authenticateUser, async (req: AuthRequest, res, next) => {
       url: '/feed',
     });
 
+    logger.info(`Sending test notification to ${subscriptions.length} subscription(s)`);
+
     // Send to all subscriptions
-    const promises = subscriptions.map((sub) =>
-      webpush
-        .sendNotification(
-          {
-            endpoint: sub.endpoint,
-            keys: {
-              p256dh: sub.p256dh_key,
-              auth: sub.auth_key,
+    const results = await Promise.allSettled(
+      subscriptions.map((sub) =>
+        webpush
+          .sendNotification(
+            {
+              endpoint: sub.endpoint,
+              keys: {
+                p256dh: sub.p256dh_key,
+                auth: sub.auth_key,
+              },
             },
-          },
-          payload
-        )
-        .catch((err) => {
-          logger.error(`Failed to send to ${sub.endpoint}:`, err);
-          // Remove invalid subscriptions
-          if (err.statusCode === 410) {
-            supabase.from('push_subscriptions').delete().eq('id', sub.id);
-          }
-        })
+            payload
+          )
+          .then(() => {
+            logger.info(`Successfully sent to ${sub.endpoint}`);
+            return { success: true, endpoint: sub.endpoint };
+          })
+          .catch((err) => {
+            logger.error(`Failed to send to ${sub.endpoint}:`, {
+              error: err.message,
+              statusCode: err.statusCode,
+              body: err.body,
+            });
+            // Remove invalid subscriptions
+            if (err.statusCode === 410) {
+              supabase.from('push_subscriptions').delete().eq('id', sub.id);
+              logger.info(`Removed invalid subscription ${sub.id}`);
+            }
+            return { success: false, endpoint: sub.endpoint, error: err.message };
+          })
+      )
     );
 
-    await Promise.all(promises);
+    const successCount = results.filter((r) => r.status === 'fulfilled' && r.value.success).length;
+    const failCount = results.length - successCount;
 
-    logger.info(`Test notification sent to user ${userId}`);
-    res.json({ message: 'Test notification sent' });
+    logger.info(`Test notification results: ${successCount} successful, ${failCount} failed`);
+
+    if (successCount === 0) {
+      throw new AppError('Failed to send notification to any subscription. Check browser console for errors.', 500);
+    }
+
+    res.json({ 
+      message: `Test notification sent to ${successCount} device(s)`,
+      details: {
+        total: results.length,
+        successful: successCount,
+        failed: failCount,
+      }
+    });
   } catch (error) {
     next(error);
   }

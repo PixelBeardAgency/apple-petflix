@@ -55,6 +55,47 @@ VAPID_PRIVATE_KEY=your_vapid_private_key
 VAPID_SUBJECT=mailto:your-email@example.com
 ```
 
+### 🔔 How to Generate VAPID Keys (Required for Push Notifications)
+
+VAPID keys are needed for web push notifications to work. Generate them using the `web-push` npm package:
+
+**Method 1: Using npx (easiest)**
+```bash
+npx web-push generate-vapid-keys
+```
+
+**Method 2: Install globally**
+```bash
+npm install -g web-push
+web-push generate-vapid-keys
+```
+
+This will output:
+```
+=======================================
+
+Public Key:
+BNx...your-public-key-here...abc
+
+Private Key:
+xyz...your-private-key-here...123
+
+=======================================
+```
+
+**Copy these keys to:**
+1. **Vercel Environment Variables** (both frontend and backend):
+   - `VITE_VAPID_PUBLIC_KEY` = Public Key (frontend)
+   - `VAPID_PUBLIC_KEY` = Public Key (backend)
+   - `VAPID_PRIVATE_KEY` = Private Key (backend)
+   - `VAPID_SUBJECT` = `mailto:your-email@example.com` (backend)
+
+2. **Local `.env` files** (for testing):
+   - `frontend/.env`: Add `VITE_VAPID_PUBLIC_KEY=...`
+   - `backend/.env`: Add `VAPID_PUBLIC_KEY=...`, `VAPID_PRIVATE_KEY=...`, `VAPID_SUBJECT=...`
+
+⚠️ **Without VAPID keys, push notifications will silently fail!**
+
 ---
 
 ## 📧 Supabase Email Templates (Optional but Recommended)
