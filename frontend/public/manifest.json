@@ -10,51 +10,45 @@
   "scope": "/",
   "icons": [
     {
-      "src": "/icons/icon-72x72.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72'%3E%3Crect width='72' height='72' fill='%23f97316' rx='12'/%3E%3Ctext x='50%25' y='50%25' font-size='36' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "72x72",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     },
     {
-      "src": "/icons/icon-96x96.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='96' height='96'%3E%3Crect width='96' height='96' fill='%23f97316' rx='15'/%3E%3Ctext x='50%25' y='50%25' font-size='48' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "96x96",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     },
     {
-      "src": "/icons/icon-128x128.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128'%3E%3Crect width='128' height='128' fill='%23f97316' rx='20'/%3E%3Ctext x='50%25' y='50%25' font-size='64' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "128x128",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     },
     {
-      "src": "/icons/icon-144x144.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='144' height='144'%3E%3Crect width='144' height='144' fill='%23f97316' rx='22'/%3E%3Ctext x='50%25' y='50%25' font-size='72' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "144x144",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     },
     {
-      "src": "/icons/icon-152x152.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='152' height='152'%3E%3Crect width='152' height='152' fill='%23f97316' rx='23'/%3E%3Ctext x='50%25' y='50%25' font-size='76' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "152x152",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     },
     {
-      "src": "/icons/icon-192x192.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='192' height='192'%3E%3Crect width='192' height='192' fill='%23f97316' rx='30'/%3E%3Ctext x='50%25' y='50%25' font-size='96' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml",
+      "purpose": "any"
     },
     {
-      "src": "/icons/icon-384x384.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='384' height='384'%3E%3Crect width='384' height='384' fill='%23f97316' rx='60'/%3E%3Ctext x='50%25' y='50%25' font-size='192' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "384x384",
-      "type": "image/png",
-      "purpose": "any maskable"
+      "type": "image/svg+xml"
     },
     {
-      "src": "/icons/icon-512x512.png",
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='512' height='512'%3E%3Crect width='512' height='512' fill='%23f97316' rx='80'/%3E%3Ctext x='50%25' y='50%25' font-size='256' text-anchor='middle' dominant-baseline='middle' fill='white'%3E🐾%3C/text%3E%3C/svg%3E",
       "sizes": "512x512",
-      "type": "image/png",
+      "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ],
