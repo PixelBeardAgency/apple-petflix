@@ -13,6 +13,7 @@ export interface AuthRequest extends Request {
   user?: {
     id: string;
     email: string;
+    is_admin?: boolean;
   };
 }
 
@@ -43,10 +44,18 @@ export const authenticateUser = async (
 
     logger.info(`Auth middleware: User authenticated - ${user.id}`);
 
+    // Fetch user profile to check admin status
+    const { data: profile } = await supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('id', user.id)
+      .single();
+
     // Attach user to request
     req.user = {
       id: user.id,
       email: user.email || '',
+      is_admin: profile?.is_admin || false,
     };
 
     next();
@@ -69,9 +78,17 @@ export const optionalAuth = async (
       const { data: { user } } = await supabase.auth.getUser(token);
 
       if (user) {
+        // Fetch user profile for optional auth too
+        const { data: profile } = await supabase
+          .from('profiles')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single();
+
         req.user = {
           id: user.id,
           email: user.email || '',
+          is_admin: profile?.is_admin || false,
         };
       }
     }
@@ -80,6 +97,32 @@ export const optionalAuth = async (
   } catch (error) {
     // Continue without authentication
     next();
+  }
+};
+
+/**
+ * Middleware to require admin privileges
+ * Must be used after authenticateUser
+ */
+export const requireAdmin = async (
+  req: AuthRequest,
+  _res: Response,
+  next: NextFunction
+) => {
+  try {
+    if (!req.user) {
+      throw new AppError('Authentication required', 401);
+    }
+
+    if (!req.user.is_admin) {
+      logger.warn(`Admin access denied for user: ${req.user.id}`);
+      throw new AppError('Admin privileges required', 403);
+    }
+
+    logger.info(`Admin access granted for user: ${req.user.id}`);
+    next();
+  } catch (error) {
+    next(error);
   }
 };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { moderationService } from '../services/moderation';
+import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
@@ -30,12 +31,29 @@ interface Stats {
 }
 
 export function ModerationPage() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [reports, setReports] = useState<Report[]>([]);
   const [stats, setStats] = useState<Stats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState('pending');
   const [updating, setUpdating] = useState<string | null>(null);
+
+  // Redirect non-admin users
+  useEffect(() => {
+    const checkAdmin = async () => {
+      if (!user) {
+        navigate('/login');
+        return;
+      }
+
+      // Try to load data - if user is not admin, API will return 403
+      // and we'll handle it in the catch block
+    };
+
+    checkAdmin();
+  }, [user, navigate]);
 
   useEffect(() => {
     loadData();
@@ -53,7 +71,15 @@ export function ModerationPage() {
       setReports(reportsResult.reports);
       setStats(statsResult);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load moderation data');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to load moderation data';
+      
+      // If user is not admin, show specific message and redirect
+      if (errorMessage.includes('Admin privileges required') || errorMessage.includes('403')) {
+        setError('You do not have permission to access this page. Admin privileges required.');
+        setTimeout(() => navigate('/'), 3000);
+      } else {
+        setError(errorMessage);
+      }
     } finally {
       setLoading(false);
     }

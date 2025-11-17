@@ -1,7 +1,7 @@
 import 'dotenv/config';
 import { Router } from 'express';
 import { createClient } from '@supabase/supabase-js';
-import { authenticateUser, AuthRequest } from '../middleware/auth';
+import { authenticateUser, requireAdmin, AuthRequest } from '../middleware/auth';
 import { AppError } from '../middleware/errorHandler';
 
 const router = Router();
@@ -19,9 +19,9 @@ const supabase = createClient(supabaseUrl, supabaseServiceKey, {
 
 /**
  * GET /api/moderation/reports
- * Get all video reports (admin only for MVP, will add role check later)
+ * Get all video reports (admin only)
  */
-router.get('/reports', authenticateUser, async (req: AuthRequest, res, next) => {
+router.get('/reports', authenticateUser, requireAdmin, async (req: AuthRequest, res, next) => {
   try {
     const { limit = '50', offset = '0', status = 'pending' } = req.query;
 
@@ -61,9 +61,9 @@ router.get('/reports', authenticateUser, async (req: AuthRequest, res, next) => 
 
 /**
  * PUT /api/moderation/reports/:reportId
- * Update report status (resolve, dismiss, etc.)
+ * Update report status (resolve, dismiss, etc.) - admin only
  */
-router.put('/reports/:reportId', authenticateUser, async (req: AuthRequest, res, next) => {
+router.put('/reports/:reportId', authenticateUser, requireAdmin, async (req: AuthRequest, res, next) => {
   try {
     const { reportId } = req.params;
     const { status, resolution_notes } = req.body;
@@ -97,9 +97,9 @@ router.put('/reports/:reportId', authenticateUser, async (req: AuthRequest, res,
 
 /**
  * GET /api/moderation/stats
- * Get moderation statistics
+ * Get moderation statistics - admin only
  */
-router.get('/stats', authenticateUser, async (_req: AuthRequest, res, next) => {
+router.get('/stats', authenticateUser, requireAdmin, async (_req: AuthRequest, res, next) => {
   try {
     // Get pending reports count
     const { count: pendingCount } = await supabase
