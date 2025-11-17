@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { playlistService } from '../services/playlist';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -28,6 +29,7 @@ export function PlaylistsPage() {
     description: '',
     is_public: true,
   });
+  const [playlistToDelete, setPlaylistToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -73,11 +75,10 @@ export function PlaylistsPage() {
   };
 
   const handleDelete = async (playlistId: string) => {
-    if (!confirm('Delete this playlist? This cannot be undone.')) return;
-
     try {
       await playlistService.deletePlaylist(playlistId);
       setPlaylists(playlists.filter((p) => p.id !== playlistId));
+      setPlaylistToDelete(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete playlist');
     }
@@ -228,7 +229,7 @@ export function PlaylistsPage() {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => handleDelete(playlist.id)}
+                        onClick={() => setPlaylistToDelete(playlist.id)}
                       >
                         Delete
                       </Button>
@@ -240,6 +241,19 @@ export function PlaylistsPage() {
           )}
         </div>
       </main>
+
+      {/* Confirm Delete Dialog */}
+      {playlistToDelete && (
+        <ConfirmDialog
+          title="Delete Playlist"
+          message="Are you sure you want to delete this playlist? This action cannot be undone."
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={() => handleDelete(playlistToDelete)}
+          onCancel={() => setPlaylistToDelete(null)}
+        />
+      )}
     </div>
   );
 }

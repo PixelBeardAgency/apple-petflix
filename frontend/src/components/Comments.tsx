@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { commentService } from '../services/comment';
 import { useAuth } from '../contexts/AuthContext';
+import { ConfirmDialog } from './ConfirmDialog';
 import { Button } from './ui/button';
 import { Card, CardContent, CardHeader } from './ui/card';
 import { formatRelativeTime } from '../lib/utils';
@@ -31,6 +32,7 @@ export function Comments({ videoId }: CommentsProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editText, setEditText] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
 
   useEffect(() => {
     loadComments();
@@ -80,11 +82,10 @@ export function Comments({ videoId }: CommentsProps) {
   };
 
   const handleDelete = async (commentId: string) => {
-    if (!confirm('Delete this comment?')) return;
-
     try {
       await commentService.deleteComment(commentId);
       setComments(comments.filter((c) => c.id !== commentId));
+      setCommentToDelete(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to delete comment');
     }
@@ -179,7 +180,7 @@ export function Comments({ videoId }: CommentsProps) {
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => handleDelete(comment.id)}
+                        onClick={() => setCommentToDelete(comment.id)}
                       >
                         Delete
                       </Button>
@@ -223,6 +224,19 @@ export function Comments({ videoId }: CommentsProps) {
             </Card>
           ))}
         </div>
+      )}
+
+      {/* Confirm Delete Comment Dialog */}
+      {commentToDelete && (
+        <ConfirmDialog
+          title="Delete Comment"
+          message="Are you sure you want to delete this comment?"
+          confirmText="Delete"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={() => handleDelete(commentToDelete)}
+          onCancel={() => setCommentToDelete(null)}
+        />
       )}
     </div>
   );

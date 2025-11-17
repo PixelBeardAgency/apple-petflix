@@ -5,6 +5,7 @@ import { tagService } from '../services/tag';
 import { useAuth } from '../contexts/AuthContext';
 import { Header } from '../components/Header';
 import { EditPlaylistModal } from '../components/EditPlaylistModal';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
@@ -30,6 +31,7 @@ export function PlaylistDetailPage() {
   const [addingTagFor, setAddingTagFor] = useState<string | null>(null);
   const [newTagName, setNewTagName] = useState('');
   const [showEditModal, setShowEditModal] = useState(false);
+  const [videoToRemove, setVideoToRemove] = useState<string | null>(null);
 
   useEffect(() => {
     if (playlistId) {
@@ -92,7 +94,7 @@ export function PlaylistDetailPage() {
   };
 
   const handleRemoveVideo = async (videoId: string) => {
-    if (!playlistId || !confirm('Remove this video from the playlist?')) return;
+    if (!playlistId) return;
 
     try {
       await playlistService.removeVideo(playlistId, videoId);
@@ -102,6 +104,7 @@ export function PlaylistDetailPage() {
           videos: playlist.videos.filter((v) => v.id !== videoId),
         });
       }
+      setVideoToRemove(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to remove video');
     }
@@ -293,7 +296,7 @@ export function PlaylistDetailPage() {
                                 <Button
                                   size="sm"
                                   variant="ghost"
-                                  onClick={() => handleRemoveVideo(video.id)}
+                                  onClick={() => setVideoToRemove(video.id)}
                                 >
                                   Remove
                                 </Button>
@@ -328,6 +331,19 @@ export function PlaylistDetailPage() {
           playlist={playlist}
           onClose={() => setShowEditModal(false)}
           onUpdate={handleUpdatePlaylist}
+        />
+      )}
+
+      {/* Confirm Remove Video Dialog */}
+      {videoToRemove && (
+        <ConfirmDialog
+          title="Remove Video"
+          message="Are you sure you want to remove this video from the playlist?"
+          confirmText="Remove"
+          cancelText="Cancel"
+          variant="destructive"
+          onConfirm={() => handleRemoveVideo(videoToRemove)}
+          onCancel={() => setVideoToRemove(null)}
         />
       )}
     </div>
