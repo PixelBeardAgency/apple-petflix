@@ -45,8 +45,23 @@ router.post('/subscribe', authenticateUser, async (req: AuthRequest, res, next) 
     const userId = req.user!.id;
     const { endpoint, keys } = req.body;
 
+    logger.info('Push subscription request received', {
+      userId,
+      hasEndpoint: !!endpoint,
+      hasKeys: !!keys,
+      hasP256dh: !!keys?.p256dh,
+      hasAuth: !!keys?.auth,
+    });
+
     if (!endpoint || !keys || !keys.p256dh || !keys.auth) {
-      throw new AppError('Invalid subscription data', 400);
+      logger.error('Invalid subscription data', {
+        endpoint: !!endpoint,
+        keys: !!keys,
+        p256dh: !!keys?.p256dh,
+        auth: !!keys?.auth,
+        bodyKeys: Object.keys(req.body),
+      });
+      throw new AppError('Invalid subscription data. Missing endpoint or keys.', 400);
     }
 
     // Check if subscription already exists
@@ -58,6 +73,7 @@ router.post('/subscribe', authenticateUser, async (req: AuthRequest, res, next) 
       .single();
 
     if (existing) {
+      logger.info(`User ${userId} already has subscription for this endpoint`);
       res.json({ message: 'Already subscribed' });
       return;
     }
