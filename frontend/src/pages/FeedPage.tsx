@@ -60,11 +60,12 @@ export function FeedPage() {
               <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">
                 Your feed is empty
               </h3>
-              <p className="text-sm sm:text-base text-muted-foreground mb-6 px-4">
-                Follow other users to see their shared videos here!
+              <p className="text-sm sm:text-base text-muted-foreground mb-6 px-4 max-w-md mx-auto">
+                Your feed shows videos from people <strong>you follow</strong>. 
+                Start following other pet lovers to see their videos here!
               </p>
               <Link to="/search">
-                <Button className="text-sm sm:text-base">Discover Videos</Button>
+                <Button className="text-sm sm:text-base">Find Users to Follow</Button>
               </Link>
             </div>
           )}

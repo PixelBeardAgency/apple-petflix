@@ -64,6 +64,12 @@ export function PushNotificationPrompt() {
     setError(null);
 
     try {
+      // Check if VAPID key is configured
+      const vapidKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
+      if (!vapidKey) {
+        throw new Error('Push notifications are not configured. Please contact support.');
+      }
+
       // Get user token (from Supabase session)
       const { data, error: sessionError } = await supabase.auth.getSession();
       
@@ -81,8 +87,14 @@ export function PushNotificationPrompt() {
       setShow(false);
       localStorage.setItem('push-prompt-dismissed', 'true');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to enable notifications');
+      const errorMessage = err instanceof Error ? err.message : 'Failed to enable notifications';
+      setError(errorMessage);
       console.error('Failed to enable push notifications:', err);
+      
+      // Auto-hide error after 5 seconds
+      setTimeout(() => {
+        setError(null);
+      }, 5000);
     } finally {
       setLoading(false);
     }

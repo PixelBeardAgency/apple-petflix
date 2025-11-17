@@ -243,22 +243,29 @@ class OnboardingService {
   }
 
   /**
-   * Save onboarding progress to backend (optional)
+   * Save onboarding progress to backend (uses tutorial backend endpoints)
    */
   async syncProgress(token: string): Promise<void> {
     const progress = this.getProgress();
     
     try {
-      await fetch(`${API_URL}/api/users/onboarding`, {
-        method: 'PUT',
+      // Determine which endpoint to call based on status
+      let endpoint: string;
+      if (progress.tutorialCompleted) {
+        endpoint = `${API_URL}/api/tutorial/complete`;
+      } else if (progress.skipped) {
+        endpoint = `${API_URL}/api/tutorial/skip`;
+      } else {
+        // No action needed - tutorial is in progress
+        return;
+      }
+
+      await fetch(endpoint, {
+        method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          completed: progress.tutorialCompleted,
-          skipped: progress.skipped,
-        }),
       });
     } catch (error) {
       console.error('Failed to sync onboarding progress:', error);

@@ -25,11 +25,19 @@ export class AuthService {
   async signUp({ email, password, username }: SignUpData): Promise<AuthResponse> {
     try {
       // Check if username is already taken
-      const { data: existingProfile } = await supabase
+      const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('username')
         .eq('username', username)
-        .single();
+        .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 when no row found
+
+      // Ignore PGRST116 error (no rows found) - that's what we want
+      if (checkError && checkError.code !== 'PGRST116') {
+        return {
+          user: null,
+          error: checkError,
+        };
+      }
 
       if (existingProfile) {
         return {

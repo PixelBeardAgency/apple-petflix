@@ -307,7 +307,9 @@ export function ProfilePage() {
       <main className="container mx-auto px-4 py-4 sm:py-8 max-w-2xl">
         <Card>
           <CardHeader>
-            <CardTitle className="text-xl sm:text-2xl">My Profile</CardTitle>
+            <CardTitle className="text-xl sm:text-2xl">
+              {isOwnProfile ? 'My Profile' : `${profile.username}'s Profile`}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             {error && (
@@ -448,7 +450,9 @@ export function ProfilePage() {
                   />
                   <div className="text-center sm:text-left">
                     <h3 className="text-xl sm:text-2xl font-bold text-foreground">{profile.username}</h3>
-                    <p className="text-sm sm:text-base text-muted-foreground break-all">{user.email}</p>
+                    {isOwnProfile && (
+                      <p className="text-sm sm:text-base text-muted-foreground break-all">{user.email}</p>
+                    )}
                     <div className="flex justify-center sm:justify-start space-x-4 mt-2 text-sm">
                       <span className="text-foreground">
                         <strong>{followerCount}</strong> followers
