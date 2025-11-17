@@ -17,6 +17,7 @@ import tagRoutes from './routes/tags';
 import moderationRoutes from './routes/moderation';
 import pushRoutes from './routes/push';
 import profilesRoutes from './routes/profiles';
+import tutorialRoutes from './routes/tutorial';
 import securityRoutes from './routes/security';
 
 dotenv.config();
@@ -132,6 +133,7 @@ app.use('/api/playlists', playlistRoutes);
 app.use('/api/tags', tagRoutes);
 app.use('/api/moderation', moderationRoutes);
 app.use('/api/push', pushRoutes);
+app.use('/api/tutorial', tutorialRoutes);
 app.use('/api', securityRoutes);
 
 // Error handling middleware (must be last)

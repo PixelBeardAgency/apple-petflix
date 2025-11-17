@@ -20,16 +20,20 @@ export function OnboardingManager() {
     }
 
     // Check if we should show onboarding
-    const shouldShow = onboardingService.shouldShowOnboarding();
-    
-    if (shouldShow) {
-      // Small delay before showing welcome
-      const timer = setTimeout(() => {
-        setShowWelcome(true);
-      }, 1000);
+    const checkOnboarding = async () => {
+      const shouldShow = await onboardingService.shouldShowOnboarding();
+      
+      if (shouldShow) {
+        // Small delay before showing welcome
+        const timer = setTimeout(() => {
+          setShowWelcome(true);
+        }, 1000);
 
-      return () => clearTimeout(timer);
-    }
+        return () => clearTimeout(timer);
+      }
+    };
+
+    checkOnboarding();
   }, [user]);
 
   const handleStartTutorial = () => {

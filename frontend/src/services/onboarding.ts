@@ -4,6 +4,7 @@
  */
 
 import { API_URL } from '../config/api';
+import { tutorialService } from './tutorial';
 
 export type TutorialStep = {
   id: string;
@@ -108,8 +109,24 @@ class OnboardingService {
 
   /**
    * Check if user should see onboarding
+   * Now checks backend first, falls back to localStorage
    */
-  shouldShowOnboarding(): boolean {
+  async shouldShowOnboarding(): Promise<boolean> {
+    try {
+      // Try to get status from backend
+      const status = await tutorialService.getStatus();
+      return !status.completed && !status.skipped;
+    } catch (error) {
+      // Fall back to localStorage if backend fails (user might not be logged in)
+      const progress = this.getProgress();
+      return !progress.welcomeShown && !progress.skipped;
+    }
+  }
+
+  /**
+   * Synchronous version for immediate checks
+   */
+  shouldShowOnboardingSync(): boolean {
     const progress = this.getProgress();
     return !progress.welcomeShown && !progress.skipped;
   }
@@ -173,6 +190,11 @@ class OnboardingService {
     progress.skipped = true;
     progress.tutorialCompleted = true;
     this.saveProgress(progress);
+    
+    // Sync to backend
+    tutorialService.skip().catch(err => {
+      console.error('Failed to sync skip to backend:', err);
+    });
   }
 
   /**
@@ -183,13 +205,25 @@ class OnboardingService {
     progress.tutorialCompleted = true;
     progress.currentStep = TUTORIAL_STEPS.length - 1;
     this.saveProgress(progress);
+    
+    // Sync to backend
+    tutorialService.complete().catch(err => {
+      console.error('Failed to sync complete to backend:', err);
+    });
   }
 
   /**
    * Reset onboarding (for testing)
    */
-  reset(): void {
+  async reset(): Promise<void> {
     localStorage.removeItem(this.STORAGE_KEY);
+    
+    // Reset on backend too
+    try {
+      await tutorialService.reset();
+    } catch (err) {
+      console.error('Failed to reset tutorial on backend:', err);
+    }
   }
 
   /**
