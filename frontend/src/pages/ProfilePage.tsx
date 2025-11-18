@@ -228,11 +228,13 @@ export function ProfilePage() {
     setLoadingFollowers(true);
     try {
       const result = await followService.getFollowers(profile.id, 20, 0);
-      setFollowers(result.followers);
+      // Extract follower profiles from the nested structure
+      const followerProfiles = result.followers.map((item: any) => item.follower);
+      setFollowers(followerProfiles);
       
       // Load follow status for each follower (if not viewing own profile)
       if (user?.id && user.id !== profile.id) {
-        const statusPromises = result.followers.map(async (follower: Profile) => {
+        const statusPromises = followerProfiles.map(async (follower: Profile) => {
           if (follower.id === user.id) return [follower.id, false]; // Can't follow yourself
           const status = await followService.getFollowStatus(follower.id);
           return [follower.id, status];
@@ -252,11 +254,13 @@ export function ProfilePage() {
     setLoadingFollowing(true);
     try {
       const result = await followService.getFollowing(profile.id, 20, 0);
-      setFollowing(result.following);
+      // Extract following profiles from the nested structure
+      const followingProfiles = result.following.map((item: any) => item.following);
+      setFollowing(followingProfiles);
       
       // Load follow status for each user being followed (if not viewing own profile)
       if (user?.id && user.id !== profile.id) {
-        const statusPromises = result.following.map(async (followedUser: Profile) => {
+        const statusPromises = followingProfiles.map(async (followedUser: Profile) => {
           if (followedUser.id === user.id) return [followedUser.id, false]; // Can't follow yourself
           const status = await followService.getFollowStatus(followedUser.id);
           return [followedUser.id, status];

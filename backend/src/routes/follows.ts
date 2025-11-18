@@ -155,7 +155,7 @@ router.get('/:userId/followers', async (req, res, next) => {
       .from('followers')
       .select(
         `
-        follower:profiles!follower_id(id, username, profile_picture_url),
+        follower:profiles!follower_id(id, username, profile_picture_url, bio),
         created_at
       `,
         { count: 'exact' }
@@ -192,7 +192,7 @@ router.get('/:userId/following', async (req, res, next) => {
       .from('followers')
       .select(
         `
-        following:profiles!following_id(id, username, profile_picture_url),
+        following:profiles!following_id(id, username, profile_picture_url, bio),
         created_at
       `,
         { count: 'exact' }
