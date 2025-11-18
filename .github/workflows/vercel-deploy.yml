@@ -1,9 +1,12 @@
 name: Vercel Production Deployment
 
+# DISABLED: Using Vercel's native GitHub integration instead
+# To re-enable, add VERCEL_TOKEN, VERCEL_ORG_ID, and VERCEL_PROJECT_ID secrets
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # Manual trigger only
+  # push:
+  #   branches:
+  #     - main
 
 env:
   VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
