@@ -172,7 +172,7 @@ export function LandingPage() {
         <div className="container mx-auto px-4 py-6 sm:py-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-3 sm:space-y-4 md:space-y-0">
             <div className="text-muted-foreground text-xs sm:text-sm">
-              © 2024 Petflix. All rights reserved.
+              © 2025 Petflix. All rights reserved.
             </div>
             <div className="flex space-x-4 sm:space-x-6 text-xs sm:text-sm">
               <Link to="/terms" className="text-muted-foreground hover:text-foreground">
