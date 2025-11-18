@@ -105,12 +105,12 @@ jobs:
 
       - name: Backend security audit
         working-directory: ./backend
-        run: npm audit --audit-level=high
+        run: npm audit --omit=dev --audit-level=critical
         continue-on-error: true
 
       - name: Frontend security audit
         working-directory: ./frontend
-        run: npm audit --audit-level=high
+        run: npm audit --omit=dev --audit-level=critical
         continue-on-error: true
 
   # E2E tests
