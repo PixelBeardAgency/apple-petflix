@@ -240,7 +240,7 @@ export function ProfilePage() {
     try {
       let profilePictureUrl = formData.profile_picture_url;
 
-      // If a file was selected, upload it first
+      // If a file was selected, upload it first and ignore the URL field
       if (selectedFile && user?.id) {
         setUploading(true);
         try {
@@ -259,6 +259,10 @@ export function ProfilePage() {
         } finally {
           setUploading(false);
         }
+      } else if (!formData.profile_picture_url && profile?.profile_picture_url) {
+        // If URL field is empty but user had a profile picture, keep the existing one
+        // This prevents accidentally removing the profile picture when just editing other fields
+        profilePictureUrl = profile.profile_picture_url;
       }
 
       const { error } = await updateProfile({
@@ -283,11 +287,27 @@ export function ProfilePage() {
     }
   };
 
-  const handleCancel = () => {
+  const handleEditProfile = () => {
+    // If profile picture is from storage (uploaded file), don't populate the URL field
+    const isStorageUrl = profile?.profile_picture_url?.includes('/avatars/');
     setFormData({
       username: profile?.username || '',
       bio: profile?.bio || '',
-      profile_picture_url: profile?.profile_picture_url || '',
+      profile_picture_url: isStorageUrl ? '' : (profile?.profile_picture_url || ''),
+    });
+    setSelectedFile(null);
+    setPreviewUrl(null);
+    setError(null);
+    setEditing(true);
+  };
+
+  const handleCancel = () => {
+    // If profile picture is from storage (uploaded file), don't populate the URL field
+    const isStorageUrl = profile?.profile_picture_url?.includes('/avatars/');
+    setFormData({
+      username: profile?.username || '',
+      bio: profile?.bio || '',
+      profile_picture_url: isStorageUrl ? '' : (profile?.profile_picture_url || ''),
     });
     setSelectedFile(null);
     setPreviewUrl(null);
@@ -476,7 +496,7 @@ export function ProfilePage() {
                 </div>
 
                 {isOwnProfile ? (
-                  <Button onClick={() => setEditing(true)} className="w-full sm:w-auto">Edit Profile</Button>
+                  <Button onClick={handleEditProfile} className="w-full sm:w-auto">Edit Profile</Button>
                 ) : (
                   <Button 
                     onClick={handleFollowToggle}
