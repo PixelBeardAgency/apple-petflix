@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { supabase } from '../lib/supabase';
 import { followService } from '../services/follow';
 import { videoService } from '../services/video';
 import { playlistService } from '../services/playlist';
@@ -49,6 +50,7 @@ export function ProfilePage() {
   const [playlists, setPlaylists] = useState<Playlist[]>([]);
   const [followers, setFollowers] = useState<Profile[]>([]);
   const [following, setFollowing] = useState<Profile[]>([]);
+  const [followingStatus, setFollowingStatus] = useState<Record<string, boolean>>({});
   const [loadingVideos, setLoadingVideos] = useState(false);
   const [loadingPlaylists, setLoadingPlaylists] = useState(false);
   const [loadingFollowers, setLoadingFollowers] = useState(false);
@@ -84,6 +86,11 @@ export function ProfilePage() {
   useEffect(() => {
     if (profile?.id) {
       loadFollowCounts();
+      // Clear cached data when profile changes
+      setVideos([]);
+      setPlaylists([]);
+      setFollowers([]);
+      setFollowing([]);
       // Load the default tab (Videos) on mount
       loadVideos();
     }
@@ -127,8 +134,26 @@ export function ProfilePage() {
     }
   };
 
+  const handleFollowToggleInList = async (targetUserId: string) => {
+    if (!user?.id || targetUserId === user.id) return;
+    
+    try {
+      const currentStatus = followingStatus[targetUserId];
+      
+      if (currentStatus) {
+        await followService.unfollowUser(targetUserId);
+        setFollowingStatus(prev => ({ ...prev, [targetUserId]: false }));
+      } else {
+        await followService.followUser(targetUserId);
+        setFollowingStatus(prev => ({ ...prev, [targetUserId]: true }));
+      }
+    } catch (err) {
+      console.error('Failed to update follow status:', err);
+    }
+  };
+
   const loadVideos = async () => {
-    if (!profile?.id || loadingVideos || videos.length > 0) return;
+    if (!profile?.id || loadingVideos) return;
     setLoadingVideos(true);
     try {
       const result = await videoService.getUserVideos(profile.id);
@@ -141,11 +166,56 @@ export function ProfilePage() {
   };
 
   const loadPlaylists = async () => {
-    if (!profile?.id || loadingPlaylists || playlists.length > 0) return;
+    if (!profile?.id || loadingPlaylists) return;
     setLoadingPlaylists(true);
     try {
-      const result = await playlistService.getPlaylists(20, 0);
-      setPlaylists(result.playlists);
+      // If viewing own profile, get all playlists; otherwise, only get public playlists
+      if (isOwnProfile) {
+        const result = await playlistService.getPlaylists(20, 0);
+        setPlaylists(result.playlists);
+      } else {
+        // Query public playlists directly from Supabase for other users
+        const { data, error } = await supabase
+          .from('playlists')
+          .select('*, video_count')
+          .eq('user_id', profile.id)
+          .eq('is_public', true)
+          .order('created_at', { ascending: false })
+          .limit(20);
+        
+        if (error) {
+          throw error;
+        }
+        
+        // Get thumbnails for each playlist
+        const playlistsWithThumbnails = await Promise.all(
+          (data || []).map(async (playlist) => {
+            const { data: firstVideo } = await supabase
+              .from('playlist_videos')
+              .select('video:videos(thumbnail_url)')
+              .eq('playlist_id', playlist.id)
+              .order('position', { ascending: true })
+              .limit(1)
+              .maybeSingle();
+            
+            let thumbnailUrl = null;
+            if (firstVideo && typeof firstVideo === 'object') {
+              const video = (firstVideo as any).video;
+              if (video && typeof video === 'object') {
+                thumbnailUrl = video.thumbnail_url || null;
+              }
+            }
+            
+            return {
+              ...playlist,
+              video_count: playlist.video_count ?? 0,
+              thumbnail_url: thumbnailUrl,
+            };
+          })
+        );
+        
+        setPlaylists(playlistsWithThumbnails);
+      }
     } catch (error) {
       console.error('Failed to load playlists:', error);
     } finally {
@@ -154,11 +224,22 @@ export function ProfilePage() {
   };
 
   const loadFollowers = async () => {
-    if (!profile?.id || loadingFollowers || followers.length > 0) return;
+    if (!profile?.id || loadingFollowers) return;
     setLoadingFollowers(true);
     try {
       const result = await followService.getFollowers(profile.id, 20, 0);
       setFollowers(result.followers);
+      
+      // Load follow status for each follower (if not viewing own profile)
+      if (user?.id && user.id !== profile.id) {
+        const statusPromises = result.followers.map(async (follower) => {
+          if (follower.id === user.id) return [follower.id, false]; // Can't follow yourself
+          const status = await followService.getFollowStatus(follower.id);
+          return [follower.id, status];
+        });
+        const statuses = await Promise.all(statusPromises);
+        setFollowingStatus(Object.fromEntries(statuses));
+      }
     } catch (error) {
       console.error('Failed to load followers:', error);
     } finally {
@@ -167,11 +248,22 @@ export function ProfilePage() {
   };
 
   const loadFollowing = async () => {
-    if (!profile?.id || loadingFollowing || following.length > 0) return;
+    if (!profile?.id || loadingFollowing) return;
     setLoadingFollowing(true);
     try {
       const result = await followService.getFollowing(profile.id, 20, 0);
       setFollowing(result.following);
+      
+      // Load follow status for each user being followed (if not viewing own profile)
+      if (user?.id && user.id !== profile.id) {
+        const statusPromises = result.following.map(async (followedUser) => {
+          if (followedUser.id === user.id) return [followedUser.id, false]; // Can't follow yourself
+          const status = await followService.getFollowStatus(followedUser.id);
+          return [followedUser.id, status];
+        });
+        const statuses = await Promise.all(statusPromises);
+        setFollowingStatus(Object.fromEntries(statuses));
+      }
     } catch (error) {
       console.error('Failed to load following:', error);
     } finally {
@@ -634,23 +726,39 @@ export function ProfilePage() {
               ) : followers.length > 0 ? (
                 <div className="space-y-4">
                   {followers.map((follower) => (
-                    <Link
+                    <div
                       key={follower.id}
-                      to={`/profile/${follower.id}`}
-                      className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:border-primary transition-colors"
+                      className="flex items-center justify-between p-3 rounded-lg border border-border"
                     >
-                      <img
-                        src={follower.profile_picture_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${follower.id}`}
-                        alt={follower.username}
-                        className="w-12 h-12 rounded-full"
-                      />
-                      <div>
-                        <h4 className="font-semibold text-foreground">{follower.username}</h4>
-                        {follower.bio && (
-                          <p className="text-sm text-muted-foreground line-clamp-1">{follower.bio}</p>
-                        )}
-                      </div>
-                    </Link>
+                      <Link
+                        to={`/profile/${follower.id}`}
+                        className="flex items-center space-x-3 flex-1 hover:opacity-80 transition-opacity"
+                      >
+                        <img
+                          src={follower.profile_picture_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${follower.id}`}
+                          alt={follower.username}
+                          className="w-12 h-12 rounded-full"
+                        />
+                        <div>
+                          <h4 className="font-semibold text-foreground">{follower.username}</h4>
+                          {follower.bio && (
+                            <p className="text-sm text-muted-foreground line-clamp-1">{follower.bio}</p>
+                          )}
+                        </div>
+                      </Link>
+                      {!isOwnProfile && follower.id !== user?.id && (
+                        <Button
+                          variant={followingStatus[follower.id] ? 'outline' : 'default'}
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleFollowToggleInList(follower.id);
+                          }}
+                        >
+                          {followingStatus[follower.id] ? 'Unfollow' : 'Follow'}
+                        </Button>
+                      )}
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -672,24 +780,40 @@ export function ProfilePage() {
                 </div>
               ) : following.length > 0 ? (
                 <div className="space-y-4">
-                  {following.map((user) => (
-                    <Link
-                      key={user.id}
-                      to={`/profile/${user.id}`}
-                      className="flex items-center space-x-3 p-3 rounded-lg border border-border hover:border-primary transition-colors"
+                  {following.map((followedUser) => (
+                    <div
+                      key={followedUser.id}
+                      className="flex items-center justify-between p-3 rounded-lg border border-border"
                     >
-                      <img
-                        src={user.profile_picture_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.id}`}
-                        alt={user.username}
-                        className="w-12 h-12 rounded-full"
-                      />
-                      <div>
-                        <h4 className="font-semibold text-foreground">{user.username}</h4>
-                        {user.bio && (
-                          <p className="text-sm text-muted-foreground line-clamp-1">{user.bio}</p>
-                        )}
-                      </div>
-                    </Link>
+                      <Link
+                        to={`/profile/${followedUser.id}`}
+                        className="flex items-center space-x-3 flex-1 hover:opacity-80 transition-opacity"
+                      >
+                        <img
+                          src={followedUser.profile_picture_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${followedUser.id}`}
+                          alt={followedUser.username}
+                          className="w-12 h-12 rounded-full"
+                        />
+                        <div>
+                          <h4 className="font-semibold text-foreground">{followedUser.username}</h4>
+                          {followedUser.bio && (
+                            <p className="text-sm text-muted-foreground line-clamp-1">{followedUser.bio}</p>
+                          )}
+                        </div>
+                      </Link>
+                      {!isOwnProfile && followedUser.id !== user?.id && (
+                        <Button
+                          variant={followingStatus[followedUser.id] ? 'outline' : 'default'}
+                          size="sm"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            handleFollowToggleInList(followedUser.id);
+                          }}
+                        >
+                          {followingStatus[followedUser.id] ? 'Unfollow' : 'Follow'}
+                        </Button>
+                      )}
+                    </div>
                   ))}
                 </div>
               ) : (
