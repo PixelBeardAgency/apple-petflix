@@ -22,6 +22,6 @@ module.exports = {
   verbose: true,
   clearMocks: true,
   restoreMocks: true,
-  maxWorkers: 1,
+  // maxWorkers: 1 is too slow, let Jest decide based on CPU cores
 };
 
