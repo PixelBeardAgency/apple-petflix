@@ -159,8 +159,18 @@ class CastService {
    */
   private isAirPlayAvailable(): boolean {
     // AirPlay is only available in Safari with WebKit
+    // However, it requires a native <video> element, not iframes
+    // Since we use YouTube iframes, AirPlay won't work directly
+    // Users should use Safari's Share Sheet or YouTube's native app for AirPlay
+    
+    // For now, we'll return false to hide the AirPlay option
+    // TODO: Implement native video player if AirPlay is critical
+    return false;
+    
+    /* Original implementation - keeping for reference:
     const videoElement = document.createElement('video');
     return !!(videoElement as any).webkitShowPlaybackTargetPicker;
+    */
   }
 
   /**
