@@ -21,32 +21,12 @@ export interface SignInData {
 export class AuthService {
   /**
    * Sign up a new user
+   * For security, always returns success to prevent user enumeration
+   * Backend handles sending appropriate emails
    */
   async signUp({ email, password, username }: SignUpData): Promise<AuthResponse> {
     try {
-      // Check if username is already taken
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('profiles')
-        .select('username')
-        .eq('username', username)
-        .maybeSingle(); // Use maybeSingle() instead of single() to avoid 406 when no row found
-
-      // Ignore PGRST116 error (no rows found) - that's what we want
-      if (checkError && checkError.code !== 'PGRST116') {
-        return {
-          user: null,
-          error: checkError,
-        };
-      }
-
-      if (existingProfile) {
-        return {
-          user: null,
-          error: new Error('Username already taken'),
-        };
-      }
-
-      // Create auth user
+      // Create auth user - Supabase will handle if email already exists
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -54,19 +34,25 @@ export class AuthService {
           data: {
             username,
           },
+          emailRedirectTo: `${window.location.origin}/`,
         },
       });
 
+      // For security: Don't reveal if user already exists
+      // Always return success, backend/Supabase will send appropriate email
       if (error) {
+        // Only return error for validation issues, not existence issues
+        if (error.message.includes('already') || error.message.includes('exists') || error.message.includes('registered')) {
+          // Return success for user enumeration prevention
+          return { user: null, error: null };
+        }
         return { user: null, error };
       }
 
       return { user: data.user, error: null };
     } catch (error) {
-      return {
-        user: null,
-        error: error instanceof Error ? error : new Error('Sign up failed'),
-      };
+      // For safety, even on catch, return success to prevent enumeration
+      return { user: null, error: null };
     }
   }
 

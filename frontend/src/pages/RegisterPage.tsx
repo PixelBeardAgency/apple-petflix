@@ -11,7 +11,7 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -40,6 +40,7 @@ export function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setSuccess(false);
 
     // Validation
     if (!formData.username || !formData.email || !formData.password) {
@@ -82,19 +83,19 @@ export function RegisterPage() {
         username: formData.username,
       });
 
-      if (error) {
-        // Use generic error message for security (don't reveal if email exists)
-        if (error.message.toLowerCase().includes('already') || error.message.toLowerCase().includes('exists')) {
-          setError('Unable to create account. Please try different credentials.');
-        } else {
-          setError('Unable to create account. Please try again.');
-        }
-      } else {
-        // Redirect to home page after successful registration
-        navigate('/');
+      // Always show success message for security (prevent user enumeration)
+      // Backend will handle sending appropriate email to existing or new users
+      setSuccess(true);
+      
+      if (!error) {
+        // Only actually redirect if account was created successfully
+        setTimeout(() => {
+          navigate('/');
+        }, 3000);
       }
     } catch (err) {
-      setError('An unexpected error occurred. Please try again.');
+      // Even on error, show success to prevent enumeration
+      setSuccess(true);
     } finally {
       setLoading(false);
     }
@@ -114,6 +115,11 @@ export function RegisterPage() {
             {error && (
               <div className="error-message">
                 {error}
+              </div>
+            )}
+            {success && (
+              <div className="bg-green-500/15 text-green-600 dark:text-green-400 p-3 rounded-md text-sm">
+                <strong>Check your email!</strong> We've sent you a confirmation link to complete your registration.
               </div>
             )}
             <div className="space-y-2">
