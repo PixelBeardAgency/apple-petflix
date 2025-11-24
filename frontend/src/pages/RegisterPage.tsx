@@ -11,6 +11,7 @@ export function RegisterPage() {
   const navigate = useNavigate();
   const { signUp } = useAuth();
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
