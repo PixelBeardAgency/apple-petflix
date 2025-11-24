@@ -16,7 +16,7 @@ import { SharedVideoCard } from '../components/SharedVideoCard';
 import { EmptyState } from '../components/EmptyState';
 import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
 import type { Video, Playlist, Profile, User } from '../types';
-import { Video as VideoIcon, List, Users, UserPlus, Upload, X } from 'lucide-react';
+import { Video as VideoIcon, List, Users, UserPlus, Upload, X, Settings } from 'lucide-react';
 
 export function ProfilePage() {
   const navigate = useNavigate();
@@ -420,7 +420,7 @@ export function ProfilePage() {
       <Header />
 
       {/* Main Content */}
-      <main className="container mx-auto px-4 py-4 sm:py-8 max-w-2xl">
+      <main className="container mx-auto px-4 py-4 sm:py-8 max-w-6xl">
         <Card>
           <CardHeader>
             <CardTitle className="text-xl sm:text-2xl">
@@ -429,7 +429,7 @@ export function ProfilePage() {
           </CardHeader>
           <CardContent>
             {error && (
-              <div className="mb-4 p-3 rounded-md bg-destructive/15 text-destructive text-sm">
+              <div className="error-message">
                 {error}
               </div>
             )}
@@ -592,7 +592,15 @@ export function ProfilePage() {
                 </div>
 
                 {isOwnProfile ? (
-                  <Button onClick={handleEditProfile} className="w-full sm:w-auto">Edit Profile</Button>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                    <Button onClick={handleEditProfile} className="w-full sm:w-auto">Edit Profile</Button>
+                    <Link to="/settings">
+                      <Button variant="outline" className="w-full sm:w-auto">
+                        <Settings className="h-4 w-4 mr-2" />
+                        Account Settings
+                      </Button>
+                    </Link>
+                  </div>
                 ) : (
                   <Button 
                     onClick={handleFollowToggle}

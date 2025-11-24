@@ -102,6 +102,18 @@
     @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2;
   }
   
+  /* Error message styling with better contrast */
+  .error-message {
+    @apply p-3 rounded-md text-sm;
+    background-color: rgb(254 242 242); /* red-50 */
+    color: rgb(153 27 27); /* red-800 */
+  }
+  
+  .dark .error-message {
+    background-color: rgba(127, 29, 29, 0.3); /* red-900/30 */
+    color: rgb(252 165 165); /* red-300 */
+  }
+  
   /* Fade in animation */
   .fade-in {
     animation: fadeIn 0.3s ease-in;

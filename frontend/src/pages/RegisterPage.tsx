@@ -83,7 +83,12 @@ export function RegisterPage() {
       });
 
       if (error) {
-        setError(error.message);
+        // Use generic error message for security (don't reveal if email exists)
+        if (error.message.toLowerCase().includes('already') || error.message.toLowerCase().includes('exists')) {
+          setError('Unable to create account. Please try different credentials.');
+        } else {
+          setError('Unable to create account. Please try again.');
+        }
       } else {
         // Redirect to home page after successful registration
         navigate('/');
@@ -107,7 +112,7 @@ export function RegisterPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="p-3 rounded-md bg-destructive/15 text-destructive text-sm">
+              <div className="error-message">
                 {error}
               </div>
             )}

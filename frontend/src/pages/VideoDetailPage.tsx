@@ -6,7 +6,7 @@ import { Header } from '../components/Header';
 import { Comments } from '../components/Comments';
 import { FollowButton } from '../components/FollowButton';
 import { AddToPlaylistModal } from '../components/AddToPlaylistModal';
-import { CastButton } from '../components/CastButton';
+import { UpvoteButton } from '../components/UpvoteButton';
 import { Button } from '../components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import type { Video } from '../types';
@@ -61,33 +61,24 @@ export function VideoDetailPage() {
 
           {video && (
             <div className="space-y-6">
-              {/* Video Player with Cast Button */}
-              <div className="space-y-3">
-                <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden relative">
-                  <iframe
-                    src={`https://www.youtube.com/embed/${video.youtube_video_id}`}
-                    title={video.title}
-                    className="w-full h-full"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                  />
-                </div>
-                {/* Cast Button */}
-                {user && (
-                  <div className="flex justify-end">
-                    <CastButton
-                      videoId={video.youtube_video_id}
-                      videoTitle={video.title}
-                      thumbnailUrl={video.thumbnail_url || ''}
-                    />
-                  </div>
-                )}
+              {/* Video Player */}
+              <div className="aspect-video w-full bg-muted rounded-lg overflow-hidden">
+                <iframe
+                  src={`https://www.youtube.com/embed/${video.youtube_video_id}`}
+                  title={video.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
               </div>
 
               {/* Video Info */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-xl sm:text-2xl">{video.title}</CardTitle>
+                  <div className="flex items-start justify-between gap-4">
+                    <CardTitle className="text-xl sm:text-2xl flex-1">{video.title}</CardTitle>
+                    <UpvoteButton videoId={video.id} initialVoteCount={video.vote_count || 0} className="flex-shrink-0" />
+                  </div>
                   <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
                     <div className="flex items-center space-x-3">
                       <img

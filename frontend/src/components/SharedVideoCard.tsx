@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { UpvoteButton } from './UpvoteButton';
 import type { Video } from '../types';
 
 interface SharedVideoCardProps {
@@ -18,9 +19,14 @@ export function SharedVideoCard({ video }: SharedVideoCardProps) {
           />
         </div>
         <CardHeader className="p-4 flex-shrink-0">
-          <CardTitle className="text-base line-clamp-2">
-            {video.title}
-          </CardTitle>
+          <div className="flex items-start justify-between gap-2">
+            <CardTitle className="text-base line-clamp-2 flex-1">
+              {video.title}
+            </CardTitle>
+            <div onClick={(e) => e.preventDefault()}>
+              <UpvoteButton videoId={video.id} initialVoteCount={video.vote_count || 0} />
+            </div>
+          </div>
           {video.user && (
             <p className="text-xs text-muted-foreground mt-1">
               by {video.user.username}

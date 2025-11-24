@@ -1,44 +1,42 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
-import { ThemeToggle } from '../components/ThemeToggle';
+import { Header } from '../components/Header';
+import { youtubeAPI } from '../services/youtube';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
+import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
+import type { YouTubeVideo } from '../types';
+import { Play } from 'lucide-react';
 
 export function LandingPage() {
   const { user } = useAuth();
+  const [trendingVideos, setTrendingVideos] = useState<YouTubeVideo[]>([]);
+  const [loadingTrending, setLoadingTrending] = useState(true);
+  const [trendingError, setTrendingError] = useState<string | null>(null);
+
+  useEffect(() => {
+    loadTrendingVideos();
+  }, []);
+
+  const loadTrendingVideos = async () => {
+    setLoadingTrending(true);
+    setTrendingError(null);
+    try {
+      const result = await youtubeAPI.getTrendingVideos(12);
+      setTrendingVideos(result.videos);
+    } catch (err) {
+      console.error('Failed to load trending videos:', err);
+      setTrendingError('Failed to load trending videos');
+    } finally {
+      setLoadingTrending(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="border-b border-border">
-        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
-          <Link to="/" className="text-xl sm:text-2xl font-bold text-foreground">
-            🐾 Petflix
-          </Link>
-          <nav className="flex items-center space-x-2 sm:space-x-4">
-            <ThemeToggle />
-            {user ? (
-              <>
-                <Link to="/feed">
-                  <Button variant="ghost" size="sm" className="text-xs sm:text-sm">Feed</Button>
-                </Link>
-                <Link to="/profile">
-                  <Button variant="ghost" size="sm" className="text-xs sm:text-sm">Profile</Button>
-                </Link>
-              </>
-            ) : (
-              <>
-                <Link to="/login">
-                  <Button variant="ghost" size="sm" className="text-xs sm:text-sm">Sign In</Button>
-                </Link>
-                <Link to="/register">
-                  <Button size="sm" className="text-xs sm:text-sm">Get Started</Button>
-                </Link>
-              </>
-            )}
-          </nav>
-        </div>
-      </header>
+      <Header />
 
       {/* Hero Section */}
       <main className="container mx-auto px-4 py-8 sm:py-16">
@@ -79,6 +77,77 @@ export function LandingPage() {
               Your favorite pet videos, all in one place
             </p>
           </div>
+        </div>
+
+        {/* Trending Videos Section */}
+        <div className="mt-16 sm:mt-24 max-w-7xl mx-auto">
+          <div className="text-center mb-8 sm:mb-12">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3">
+              🔥 Trending Pet Videos
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground">
+              Check out what's popular right now in the pet community
+            </p>
+          </div>
+
+          {loadingTrending && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <VideoCardSkeleton key={i} />
+              ))}
+            </div>
+          )}
+
+          {trendingError && (
+            <div className="text-center py-8">
+              <p className="text-muted-foreground">{trendingError}</p>
+            </div>
+          )}
+
+          {!loadingTrending && !trendingError && trendingVideos.length > 0 && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {trendingVideos.map((video) => (
+                <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
+                  <div className="relative aspect-video cursor-pointer group">
+                    <img
+                      src={video.thumbnail}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                    />
+                    {/* Play overlay */}
+                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
+                        <Play className="w-6 h-6 text-gray-900 fill-gray-900" />
+                      </div>
+                    </div>
+                  </div>
+                  <CardHeader className="flex-shrink-0">
+                    <CardTitle className="text-base line-clamp-2">
+                      {video.title}
+                    </CardTitle>
+                    <CardDescription className="text-xs">
+                      {video.channelTitle}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="flex-1 flex flex-col justify-end">
+                    {user ? (
+                      <Link to={`/share?videoId=${video.id}`}>
+                        <Button size="sm" className="w-full">
+                          Share to Petflix
+                        </Button>
+                      </Link>
+                    ) : (
+                      <Link to="/register">
+                        <Button size="sm" variant="outline" className="w-full">
+                          Sign up to share
+                        </Button>
+                      </Link>
+                    )}
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Features Section */}

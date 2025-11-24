@@ -37,12 +37,8 @@ export function LoginPage() {
       });
 
       if (error) {
-        // Check for specific error messages
-        if (error.message.includes('Invalid login credentials')) {
-          setError('Invalid email or password');
-        } else {
-          setError(error.message);
-        }
+        // Use generic error message for security
+        setError('Invalid credentials. Please try again.');
       } else {
         // Redirect to feed after successful login
         navigate('/feed');
@@ -66,7 +62,7 @@ export function LoginPage() {
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="p-3 rounded-md bg-destructive/15 text-destructive text-sm">
+              <div className="error-message">
                 {error}
               </div>
             )}

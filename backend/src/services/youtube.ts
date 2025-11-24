@@ -38,10 +38,13 @@ export class YouTubeService {
     // Check quota
     this.checkQuota(100);
 
+    // Add pet-related keywords to ensure pet content
+    const petEnhancedQuery = `${query} (pet OR cat OR dog OR animal OR puppy OR kitten)`;
+
     try {
       const response = await youtube.search.list({
         part: ['snippet'],
-        q: query,
+        q: petEnhancedQuery,
         type: ['video'],
         maxResults,
         order,

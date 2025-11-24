@@ -6,6 +6,7 @@ import { videoSharingLimiter } from '../middleware/rateLimit';
 import { AppError } from '../middleware/errorHandler';
 import { youtubeService } from '../services/youtube';
 import { logger } from '../services/logger';
+import { sendPushNotification } from './push';
 
 const router = Router();
 
@@ -84,6 +85,53 @@ router.post('/', authenticateUser, videoSharingLimiter, async (req: AuthRequest,
         videoId: validation.videoId,
       });
       throw new AppError(error.message, 500);
+    }
+
+    // Get followers of the video creator
+    try {
+      const { data: followers } = await supabase
+        .from('followers')
+        .select('follower_id')
+        .eq('following_id', userId);
+
+      // Get user's username for notification
+      const { data: userProfile } = await supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', userId)
+        .single();
+
+      // Create notifications and send push notifications to all followers
+      if (followers && followers.length > 0 && userProfile) {
+        const notifications = followers.map(follower => ({
+          user_id: follower.follower_id,
+          type: 'video' as const,
+          message: `${userProfile.username} shared a new video: ${video.title}`,
+          related_video_id: video.id,
+          related_user_id: userId,
+        }));
+
+        // Insert notifications
+        await supabase.from('notifications').insert(notifications);
+
+        // Send push notifications
+        followers.forEach(follower => {
+          sendPushNotification(
+            follower.follower_id,
+            'New Video',
+            `${userProfile.username} shared: ${video.title}`,
+            `/video/${video.id}`,
+            'video'
+          ).catch(err => {
+            logger.error('Failed to send push notification for new video:', err);
+          });
+        });
+
+        logger.info(`Created notifications for ${followers.length} followers for video ${video.id}`);
+      }
+    } catch (notificationError) {
+      // Log but don't fail the video creation
+      logger.error('Failed to create notifications for new video:', notificationError);
     }
 
     res.status(201).json(video);
@@ -304,6 +352,132 @@ router.post('/:videoId/report', authenticateUser, async (req: AuthRequest, res, 
       message: 'Report submitted successfully',
       report,
     });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * POST /api/videos/:videoId/vote
+ * Vote on a video (upvote or downvote)
+ */
+router.post('/:videoId/vote', authenticateUser, async (req: AuthRequest, res, next) => {
+  try {
+    const { videoId } = req.params;
+    const { voteType } = req.body;
+    const userId = req.user!.id;
+
+    // Validate vote type
+    if (!voteType || !['upvote', 'downvote'].includes(voteType)) {
+      throw new AppError('Vote type must be either "upvote" or "downvote"', 400);
+    }
+
+    // Check if video exists
+    const { data: video } = await supabase
+      .from('videos')
+      .select('id')
+      .eq('id', videoId)
+      .single();
+
+    if (!video) {
+      throw new AppError('Video not found', 404);
+    }
+
+    // Check if user already voted
+    const { data: existingVote } = await supabase
+      .from('video_votes')
+      .select('*')
+      .eq('video_id', videoId)
+      .eq('user_id', userId)
+      .single();
+
+    if (existingVote) {
+      // Update existing vote
+      const { data: updated, error } = await supabase
+        .from('video_votes')
+        .update({ vote_type: voteType })
+        .eq('video_id', videoId)
+        .eq('user_id', userId)
+        .select('*')
+        .single();
+
+      if (error) {
+        throw new AppError(error.message, 500);
+      }
+
+      res.json({
+        message: 'Vote updated',
+        vote: updated,
+      });
+    } else {
+      // Create new vote
+      const { data: newVote, error } = await supabase
+        .from('video_votes')
+        .insert({
+          video_id: videoId,
+          user_id: userId,
+          vote_type: voteType,
+        })
+        .select('*')
+        .single();
+
+      if (error) {
+        throw new AppError(error.message, 500);
+      }
+
+      res.status(201).json({
+        message: 'Vote recorded',
+        vote: newVote,
+      });
+    }
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * DELETE /api/videos/:videoId/vote
+ * Remove vote from a video
+ */
+router.delete('/:videoId/vote', authenticateUser, async (req: AuthRequest, res, next) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.user!.id;
+
+    // Delete vote
+    const { error } = await supabase
+      .from('video_votes')
+      .delete()
+      .eq('video_id', videoId)
+      .eq('user_id', userId);
+
+    if (error) {
+      throw new AppError(error.message, 500);
+    }
+
+    res.json({ message: 'Vote removed' });
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * GET /api/videos/:videoId/vote
+ * Get current user's vote on a video
+ */
+router.get('/:videoId/vote', authenticateUser, async (req: AuthRequest, res, next) => {
+  try {
+    const { videoId } = req.params;
+    const userId = req.user!.id;
+
+    const { data: vote } = await supabase
+      .from('video_votes')
+      .select('*')
+      .eq('video_id', videoId)
+      .eq('user_id', userId)
+      .single();
+
+    res.json({ vote: vote || null });
   } catch (error) {
     next(error);
   }

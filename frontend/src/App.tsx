@@ -8,6 +8,7 @@ import { UpdatePrompt } from './components/UpdatePrompt';
 import { PushNotificationPrompt } from './components/PushNotificationPrompt';
 import { OnboardingManager } from './components/OnboardingManager';
 import { Toaster } from './components/ui/toaster';
+import { Header } from './components/Header';
 import './index.css';
 
 // Lazy load page components for code splitting and better performance
@@ -26,6 +27,7 @@ const PlaylistDetailPage = lazy(() => import('./pages/PlaylistDetailPage').then(
 const ModerationPage = lazy(() => import('./pages/ModerationPage').then(m => ({ default: m.ModerationPage })));
 const NotificationsPage = lazy(() => import('./pages/NotificationsPage').then(m => ({ default: m.NotificationsPage })));
 const NotificationSettingsPage = lazy(() => import('./pages/NotificationSettingsPage').then(m => ({ default: m.NotificationSettingsPage })));
+const SettingsPage = lazy(() => import('./pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 
 // Loading component for Suspense fallback
 const PageLoader = () => (
@@ -74,26 +76,29 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 
 function TermsPage() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-6">Terms of Service</h1>
-        <div className="text-muted-foreground space-y-4">
-          <p>Last updated: November 12, 2024</p>
-          <p>
-            By using Petflix, you agree to these terms. Please read them carefully.
-          </p>
-          <h2 className="text-xl font-semibold text-foreground mt-6">Acceptance of Terms</h2>
-          <p>
-            By accessing and using Petflix, you accept and agree to be bound by these Terms of Service.
-          </p>
-          <h2 className="text-xl font-semibold text-foreground mt-6">User Conduct</h2>
-          <p>
-            You agree to use Petflix responsibly and not to share inappropriate content or engage in harmful behavior.
-          </p>
-          <h2 className="text-xl font-semibold text-foreground mt-6">Content</h2>
-          <p>
-            All videos are sourced from YouTube. Petflix is not responsible for the content of third-party videos.
-          </p>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto p-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold text-foreground mb-6">Terms of Service</h1>
+          <div className="text-muted-foreground space-y-4">
+            <p>Last updated: November 12, 2024</p>
+            <p>
+              By using Petflix, you agree to these terms. Please read them carefully.
+            </p>
+            <h2 className="text-xl font-semibold text-foreground mt-6">Acceptance of Terms</h2>
+            <p>
+              By accessing and using Petflix, you accept and agree to be bound by these Terms of Service.
+            </p>
+            <h2 className="text-xl font-semibold text-foreground mt-6">User Conduct</h2>
+            <p>
+              You agree to use Petflix responsibly and not to share inappropriate content or engage in harmful behavior.
+            </p>
+            <h2 className="text-xl font-semibold text-foreground mt-6">Content</h2>
+            <p>
+              All videos are sourced from YouTube. Petflix is not responsible for the content of third-party videos.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -102,26 +107,29 @@ function TermsPage() {
 
 function PrivacyPage() {
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-3xl mx-auto">
-        <h1 className="text-3xl font-bold text-foreground mb-6">Privacy Policy</h1>
-        <div className="text-muted-foreground space-y-4">
-          <p>Last updated: November 12, 2024</p>
-          <p>
-            This Privacy Policy describes how Petflix collects, uses, and shares your personal information.
-          </p>
-          <h2 className="text-xl font-semibold text-foreground mt-6">Information We Collect</h2>
-          <p>
-            We collect information you provide directly to us, such as your email, username, and profile information.
-          </p>
-          <h2 className="text-xl font-semibold text-foreground mt-6">How We Use Your Information</h2>
-          <p>
-            We use your information to provide and improve our services, and to communicate with you.
-          </p>
-          <h2 className="text-xl font-semibold text-foreground mt-6">Data Security</h2>
-          <p>
-            We implement appropriate security measures to protect your personal information.
-          </p>
+    <div className="min-h-screen bg-background">
+      <Header />
+      <div className="container mx-auto p-8">
+        <div className="max-w-3xl mx-auto">
+          <h1 className="text-3xl font-bold text-foreground mb-6">Privacy Policy</h1>
+          <div className="text-muted-foreground space-y-4">
+            <p>Last updated: November 12, 2024</p>
+            <p>
+              This Privacy Policy describes how Petflix collects, uses, and shares your personal information.
+            </p>
+            <h2 className="text-xl font-semibold text-foreground mt-6">Information We Collect</h2>
+            <p>
+              We collect information you provide directly to us, such as your email, username, and profile information.
+            </p>
+            <h2 className="text-xl font-semibold text-foreground mt-6">How We Use Your Information</h2>
+            <p>
+              We use your information to provide and improve our services, and to communicate with you.
+            </p>
+            <h2 className="text-xl font-semibold text-foreground mt-6">Data Security</h2>
+            <p>
+              We implement appropriate security measures to protect your personal information.
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -237,6 +245,14 @@ function AppRoutes() {
         element={
           <ProtectedRoute>
             <NotificationSettingsPage />
+          </ProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <ProtectedRoute>
+            <SettingsPage />
           </ProtectedRoute>
         }
       />
