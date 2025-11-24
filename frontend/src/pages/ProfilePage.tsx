@@ -764,8 +764,10 @@ export function ProfilePage() {
                           size="sm"
                           onClick={(e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             handleFollowToggleInList(follower.id);
                           }}
+                          className="flex-shrink-0 ml-3"
                         >
                           {followingStatus[follower.id] ? 'Unfollow' : 'Follow'}
                         </Button>
@@ -819,8 +821,10 @@ export function ProfilePage() {
                           size="sm"
                           onClick={(e) => {
                             e.preventDefault();
+                            e.stopPropagation();
                             handleFollowToggleInList(followedUser.id);
                           }}
+                          className="flex-shrink-0 ml-3"
                         >
                           {followingStatus[followedUser.id] ? 'Unfollow' : 'Follow'}
                         </Button>
