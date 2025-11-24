@@ -100,7 +100,7 @@ export function Header() {
                   <span>Search</span>
                 </Link>
                 <ThemeToggle />
-                <Link to="/auth">
+                <Link to="/login">
                   <Button size="sm">Sign In</Button>
                 </Link>
               </>
@@ -202,7 +202,7 @@ export function Header() {
                     <span>Search Videos</span>
                   </Link>
                   <Link
-                    to="/auth"
+                    to="/login"
                     className="flex items-center space-x-3 px-4 py-3 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground rounded-md"
                     onClick={closeMobileMenu}
                   >

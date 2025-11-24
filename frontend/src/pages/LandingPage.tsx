@@ -23,11 +23,13 @@ export function LandingPage() {
     setLoadingTrending(true);
     setTrendingError(null);
     try {
+      console.log('Loading trending videos from:', `${import.meta.env.VITE_API_URL || ''}/api/youtube/trending`);
       const result = await youtubeAPI.getTrendingVideos(12);
+      console.log('Trending videos result:', result);
       setTrendingVideos(result.videos);
     } catch (err) {
       console.error('Failed to load trending videos:', err);
-      setTrendingError('Failed to load trending videos');
+      setTrendingError(err instanceof Error ? err.message : 'Failed to load trending videos');
     } finally {
       setLoadingTrending(false);
     }
@@ -100,7 +102,11 @@ export function LandingPage() {
 
           {trendingError && (
             <div className="text-center py-8">
-              <p className="text-muted-foreground">{trendingError}</p>
+              <div className="text-4xl mb-4">⚠️</div>
+              <p className="text-muted-foreground mb-2">{trendingError}</p>
+              <p className="text-sm text-muted-foreground">
+                Unable to load trending videos. Please check back later or search for pet videos.
+              </p>
             </div>
           )}
 
