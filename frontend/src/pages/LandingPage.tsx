@@ -4,10 +4,9 @@ import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Header } from '../components/Header';
 import { youtubeAPI } from '../services/youtube';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '../components/ui/card';
 import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
 import type { YouTubeVideo } from '../types';
-import { Play } from 'lucide-react';
+import { Play, ArrowUp, ArrowDown } from 'lucide-react';
 
 export function LandingPage() {
   const { user } = useAuth();
@@ -133,46 +132,73 @@ export function LandingPage() {
           )}
 
           {!loadingTrending && !trendingError && trendingVideos.length > 0 && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {trendingVideos.map((video) => (
-                <Card key={video.id} className="overflow-hidden hover:shadow-lg transition-shadow h-full flex flex-col">
-                  <div className="relative aspect-video cursor-pointer group">
+                <div key={video.id} className="group cursor-pointer">
+                  {/* Video Thumbnail */}
+                  <Link 
+                    to={user ? `/share?videoId=${video.id}` : '/login'}
+                    className="block relative aspect-video rounded-lg overflow-hidden bg-muted mb-2"
+                  >
                     <img
                       src={video.thumbnail}
                       alt={video.title}
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-cover transition-transform group-hover:scale-105"
                     />
-                    {/* Play overlay */}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                      <div className="w-16 h-16 rounded-full bg-white/90 flex items-center justify-center">
-                        <Play className="w-6 h-6 text-gray-900 fill-gray-900" />
+                    {/* Play overlay on hover */}
+                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <div className="w-16 h-16 rounded-full bg-red-600 flex items-center justify-center transform group-hover:scale-110 transition-transform">
+                        <Play className="w-8 h-8 text-white fill-white ml-1" />
                       </div>
                     </div>
+                  </Link>
+
+                  {/* Video Info */}
+                  <div className="flex gap-3">
+                    <div className="flex-1 min-w-0">
+                      <Link 
+                        to={user ? `/share?videoId=${video.id}` : '/login'}
+                        className="block"
+                      >
+                        <h3 className="font-medium text-sm line-clamp-2 text-foreground group-hover:text-primary transition-colors mb-1">
+                          {video.title}
+                        </h3>
+                        <p className="text-xs text-muted-foreground line-clamp-1">
+                          {video.channelTitle}
+                        </p>
+                      </Link>
+                    </div>
+
+                    {/* Upvote/Downvote */}
+                    <div className="flex flex-col items-center gap-1 flex-shrink-0">
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!user) {
+                            window.location.href = '/login';
+                          }
+                        }}
+                        className="p-1 hover:bg-accent rounded transition-colors"
+                        title={user ? "Upvote" : "Sign in to vote"}
+                      >
+                        <ArrowUp className="h-4 w-4 text-muted-foreground hover:text-orange-500" />
+                      </button>
+                      <span className="text-xs font-medium text-foreground">0</span>
+                      <button
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (!user) {
+                            window.location.href = '/login';
+                          }
+                        }}
+                        className="p-1 hover:bg-accent rounded transition-colors"
+                        title={user ? "Downvote" : "Sign in to vote"}
+                      >
+                        <ArrowDown className="h-4 w-4 text-muted-foreground hover:text-blue-500" />
+                      </button>
+                    </div>
                   </div>
-                  <CardHeader className="flex-shrink-0">
-                    <CardTitle className="text-base line-clamp-2">
-                      {video.title}
-                    </CardTitle>
-                    <CardDescription className="text-xs">
-                      {video.channelTitle}
-                    </CardDescription>
-                  </CardHeader>
-                  <CardContent className="flex-1 flex flex-col justify-end">
-                    {user ? (
-                      <Link to={`/share?videoId=${video.id}`}>
-                        <Button size="sm" className="w-full">
-                          Share to Petflix
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Link to="/register">
-                        <Button size="sm" variant="outline" className="w-full">
-                          Sign up to share
-                        </Button>
-                      </Link>
-                    )}
-                  </CardContent>
-                </Card>
+                </div>
               ))}
             </div>
           )}
