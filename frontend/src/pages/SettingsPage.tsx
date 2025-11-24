@@ -17,7 +17,7 @@ export function SettingsPage() {
   const [success, setSuccess] = useState<string | null>(null);
 
   // Email update state
-  const [newEmail, setNewEmail] = useState('');
+  const [email, setEmail] = useState(user?.email || '');
   const [emailLoading, setEmailLoading] = useState(false);
 
   // Password update state
@@ -33,23 +33,30 @@ export function SettingsPage() {
     setEmailLoading(true);
 
     try {
+      // Check if email actually changed
+      if (email === user?.email) {
+        throw new Error('Please enter a different email address');
+      }
+
       // Validate email
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)) {
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
         throw new Error('Please enter a valid email address');
       }
 
       // Update email in Supabase
       const { error: updateError } = await supabase.auth.updateUser({
-        email: newEmail,
+        email: email,
       });
 
       if (updateError) throw updateError;
 
       setSuccess('Verification email sent! Please check your inbox to confirm your new email address.');
-      setNewEmail('');
     } catch (err) {
-      // Use generic error message for security
-      setError('Unable to update email. Please try again.');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('Unable to update email. Please try again.');
+      }
       console.error('Email update error:', err);
     } finally {
       setEmailLoading(false);
@@ -63,7 +70,12 @@ export function SettingsPage() {
     setPasswordLoading(true);
 
     try {
-      // Validate password
+      // Validate current password is entered
+      if (!currentPassword) {
+        throw new Error('Please enter your current password');
+      }
+
+      // Validate new password
       if (newPassword.length < 8) {
         throw new Error('Password must be at least 8 characters long');
       }
@@ -82,6 +94,20 @@ export function SettingsPage() {
 
       if (newPassword !== confirmPassword) {
         throw new Error('Passwords do not match');
+      }
+
+      if (currentPassword === newPassword) {
+        throw new Error('New password must be different from current password');
+      }
+
+      // First verify current password by attempting to sign in
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email: user?.email || '',
+        password: currentPassword,
+      });
+
+      if (signInError) {
+        throw new Error('Current password is incorrect');
       }
 
       // Update password in Supabase
@@ -144,38 +170,30 @@ export function SettingsPage() {
         {/* Email Update Section */}
         <Card className="mb-6">
           <CardHeader>
-            <CardTitle>Update Email</CardTitle>
+            <CardTitle>Email Address</CardTitle>
             <CardDescription>
-              Change your account email address. You'll need to verify the new email.
+              Update your account email address. You'll need to verify the new email.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleEmailUpdate} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="currentEmail">Current Email</Label>
+                <Label htmlFor="email">Email Address</Label>
                 <Input
-                  id="currentEmail"
+                  id="email"
                   type="email"
-                  value={user.email || ''}
-                  disabled
-                  className="bg-muted"
-                />
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="newEmail">New Email</Label>
-                <Input
-                  id="newEmail"
-                  type="email"
-                  placeholder="newemail@example.com"
-                  value={newEmail}
-                  onChange={(e) => setNewEmail(e.target.value)}
+                  placeholder="your@email.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   disabled={emailLoading}
                   required
                 />
+                <p className="text-xs text-muted-foreground">
+                  Current email: {user.email}
+                </p>
               </div>
 
-              <Button type="submit" disabled={emailLoading || !newEmail}>
+              <Button type="submit" disabled={emailLoading || !email || email === user?.email}>
                 {emailLoading ? 'Updating...' : 'Update Email'}
               </Button>
             </form>
@@ -185,13 +203,26 @@ export function SettingsPage() {
         {/* Password Update Section */}
         <Card>
           <CardHeader>
-            <CardTitle>Update Password</CardTitle>
+            <CardTitle>Change Password</CardTitle>
             <CardDescription>
-              Choose a strong password to keep your account secure.
+              Enter your current password and choose a new strong password.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handlePasswordUpdate} className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="currentPassword">Current Password</Label>
+                <Input
+                  id="currentPassword"
+                  type="password"
+                  placeholder="••••••••"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  disabled={passwordLoading}
+                  required
+                />
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="newPassword">New Password</Label>
                 <Input
@@ -221,7 +252,7 @@ export function SettingsPage() {
                 />
               </div>
 
-              <Button type="submit" disabled={passwordLoading || !newPassword || !confirmPassword}>
+              <Button type="submit" disabled={passwordLoading || !currentPassword || !newPassword || !confirmPassword}>
                 {passwordLoading ? 'Updating...' : 'Update Password'}
               </Button>
             </form>
