@@ -10,6 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../co
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '../components/ui/tabs';
 import { Header } from '../components/Header';
 import { VideoPreviewModal } from '../components/VideoPreviewModal';
+import { ShareVideoModal } from '../components/ShareVideoModal';
 import { EmptyState } from '../components/EmptyState';
 import { debounce } from '../lib/utils';
 import { Search, Users, Play } from 'lucide-react';
@@ -26,6 +27,8 @@ export function SearchPage() {
   const [previewVideo, setPreviewVideo] = useState<YouTubeVideo | null>(null);
   const [nextPageToken, setNextPageToken] = useState<string | null>(null);
   const [loadingMore, setLoadingMore] = useState(false);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   const searchVideos = async (searchQuery: string, pageToken?: string) => {
     if (!searchQuery.trim()) {
@@ -112,6 +115,16 @@ export function SearchPage() {
       setUsers([]);
     }
   }, [query, activeTab, debouncedVideoSearch, debouncedUserSearch]);
+
+  const handleShareClick = (videoId: string) => {
+    setSelectedVideoId(videoId);
+    setShareModalOpen(true);
+  };
+
+  const handleShareSuccess = () => {
+    // Optionally show success message or refresh
+    console.log('Video shared successfully!');
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -243,11 +256,13 @@ export function SearchPage() {
                             {video.description}
                           </p>
                           {user && (
-                            <Link to={`/share?videoId=${video.id}`}>
-                              <Button size="sm" className="w-full">
-                                Share to Petflix
-                              </Button>
-                            </Link>
+                            <Button 
+                              size="sm" 
+                              className="w-full"
+                              onClick={() => handleShareClick(video.id)}
+                            >
+                              Share to Petflix
+                            </Button>
                           )}
                           {!user && (
                             <Link to="/register">
@@ -377,6 +392,19 @@ export function SearchPage() {
           videoId={previewVideo.id}
           videoTitle={previewVideo.title}
           onClose={() => setPreviewVideo(null)}
+        />
+      )}
+
+      {/* Share Video Modal */}
+      {selectedVideoId && (
+        <ShareVideoModal
+          isOpen={shareModalOpen}
+          onClose={() => {
+            setShareModalOpen(false);
+            setSelectedVideoId(null);
+          }}
+          videoId={selectedVideoId}
+          onSuccess={handleShareSuccess}
         />
       )}
     </div>

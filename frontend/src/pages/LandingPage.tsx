@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Button } from '../components/ui/button';
 import { Header } from '../components/Header';
+import { ShareVideoModal } from '../components/ShareVideoModal';
 import { youtubeAPI } from '../services/youtube';
 import { VideoCardSkeleton } from '../components/VideoCardSkeleton';
 import type { YouTubeVideo } from '../types';
@@ -10,9 +11,12 @@ import { Play, ArrowUp, ArrowDown } from 'lucide-react';
 
 export function LandingPage() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [trendingVideos, setTrendingVideos] = useState<YouTubeVideo[]>([]);
   const [loadingTrending, setLoadingTrending] = useState(true);
   const [trendingError, setTrendingError] = useState<string | null>(null);
+  const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [selectedVideoId, setSelectedVideoId] = useState<string | null>(null);
 
   useEffect(() => {
     loadTrendingVideos();
@@ -46,6 +50,20 @@ export function LandingPage() {
         error: trendingError 
       });
     }
+  };
+
+  const handleVideoClick = (videoId: string) => {
+    if (!user) {
+      navigate('/login');
+    } else {
+      setSelectedVideoId(videoId);
+      setShareModalOpen(true);
+    }
+  };
+
+  const handleShareSuccess = () => {
+    // Optionally refresh the feed or show a success message
+    console.log('Video shared successfully!');
   };
 
   // Debug: Log current state
@@ -136,8 +154,8 @@ export function LandingPage() {
               {trendingVideos.map((video) => (
                 <div key={video.id} className="group cursor-pointer">
                   {/* Video Thumbnail */}
-                  <Link 
-                    to={user ? `/share?videoId=${video.id}` : '/login'}
+                  <div 
+                    onClick={() => handleVideoClick(video.id)}
                     className="block relative aspect-video rounded-lg overflow-hidden bg-muted mb-2"
                   >
                     <img
@@ -151,14 +169,14 @@ export function LandingPage() {
                         <Play className="w-8 h-8 text-white fill-white ml-1" />
                       </div>
                     </div>
-                  </Link>
+                  </div>
 
                   {/* Video Info */}
                   <div className="flex gap-3">
                     <div className="flex-1 min-w-0">
-                      <Link 
-                        to={user ? `/share?videoId=${video.id}` : '/login'}
-                        className="block"
+                      <div 
+                        onClick={() => handleVideoClick(video.id)}
+                        className="block cursor-pointer"
                       >
                         <h3 className="font-medium text-sm line-clamp-2 text-foreground group-hover:text-primary transition-colors mb-1">
                           {video.title}
@@ -166,7 +184,7 @@ export function LandingPage() {
                         <p className="text-xs text-muted-foreground line-clamp-1">
                           {video.channelTitle}
                         </p>
-                      </Link>
+                      </div>
                     </div>
 
                     {/* Upvote/Downvote - prompts to share first */}
@@ -175,12 +193,7 @@ export function LandingPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          if (!user) {
-                            window.location.href = '/login';
-                          } else {
-                            // Redirect to share page so they can share it first
-                            window.location.href = `/share?videoId=${video.id}`;
-                          }
+                          handleVideoClick(video.id);
                         }}
                         className="p-1 hover:bg-accent rounded transition-colors"
                         title={user ? "Share to vote" : "Sign in to vote"}
@@ -192,12 +205,7 @@ export function LandingPage() {
                         onClick={(e) => {
                           e.preventDefault();
                           e.stopPropagation();
-                          if (!user) {
-                            window.location.href = '/login';
-                          } else {
-                            // Redirect to share page so they can share it first
-                            window.location.href = `/share?videoId=${video.id}`;
-                          }
+                          handleVideoClick(video.id);
                         }}
                         className="p-1 hover:bg-accent rounded transition-colors"
                         title={user ? "Share to vote" : "Sign in to vote"}
@@ -334,6 +342,19 @@ export function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Share Video Modal */}
+      {selectedVideoId && (
+        <ShareVideoModal
+          isOpen={shareModalOpen}
+          onClose={() => {
+            setShareModalOpen(false);
+            setSelectedVideoId(null);
+          }}
+          videoId={selectedVideoId}
+          onSuccess={handleShareSuccess}
+        />
+      )}
     </div>
   );
 }
