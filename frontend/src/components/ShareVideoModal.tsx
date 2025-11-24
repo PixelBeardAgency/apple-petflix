@@ -43,7 +43,7 @@ export function ShareVideoModal({ isOpen, onClose, videoId, onSuccess }: ShareVi
     setLoadingVideo(true);
     setError(null);
     try {
-      const data = await youtubeAPI.getVideoById(videoId);
+      const data = await youtubeAPI.getVideoDetails(videoId);
       setVideoData(data);
       setFormData({
         title: data.title,
@@ -65,14 +65,12 @@ export function ShareVideoModal({ isOpen, onClose, videoId, onSuccess }: ShareVi
     setError(null);
 
     try {
-      await videoService.shareVideo({
-        youtube_id: videoId,
-        title: formData.title,
-        description: formData.description,
-        thumbnail_url: videoData.thumbnail,
-        channel_title: videoData.channelTitle,
-        published_at: videoData.publishedAt,
-      });
+      const youtubeUrl = `https://www.youtube.com/watch?v=${videoId}`;
+      await videoService.shareVideo(
+        youtubeUrl,
+        formData.title,
+        formData.description
+      );
 
       // Success - close modal and trigger callback
       if (onSuccess) {
