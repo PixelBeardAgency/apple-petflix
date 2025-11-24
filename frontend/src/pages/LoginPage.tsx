@@ -40,8 +40,8 @@ export function LoginPage() {
         // Use generic error message for security
         setError('Invalid credentials. Please try again.');
       } else {
-        // Redirect to feed after successful login
-        navigate('/feed');
+        // Redirect to home page after successful login
+        navigate('/');
       }
     } catch (err) {
       setError('An unexpected error occurred. Please try again.');
@@ -51,8 +51,17 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col bg-background">
+      {/* Logo/Header */}
+      <div className="container mx-auto px-4 py-6">
+        <Link to="/" className="inline-block">
+          <h1 className="text-2xl font-bold text-lightblue">Petflix</h1>
+        </Link>
+      </div>
+
+      {/* Login Form */}
+      <div className="flex-1 flex items-center justify-center px-4 pb-8">
+        <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center">Welcome back</CardTitle>
           <CardDescription className="text-center">
@@ -128,6 +137,7 @@ export function LoginPage() {
           </CardFooter>
         </form>
       </Card>
+      </div>
     </div>
   );
 }

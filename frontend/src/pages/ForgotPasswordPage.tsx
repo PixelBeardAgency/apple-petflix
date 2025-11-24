@@ -36,8 +36,16 @@ export default function ForgotPasswordPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-cream p-4">
-        <Card className="w-full max-w-md">
+      <div className="min-h-screen flex flex-col bg-cream">
+        {/* Logo/Header */}
+        <div className="container mx-auto px-4 py-6">
+          <Link to="/" className="inline-block">
+            <h1 className="text-2xl font-bold text-lightblue">Petflix</h1>
+          </Link>
+        </div>
+
+        <div className="flex-1 flex items-center justify-center p-4">
+          <Card className="w-full max-w-md">
           <CardHeader className="text-center">
             <div className="mx-auto mb-4 h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
               <Mail className="h-6 w-6 text-green-600" />
@@ -75,13 +83,22 @@ export default function ForgotPasswordPage() {
             </Link>
           </CardContent>
         </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-cream p-4">
-      <Card className="w-full max-w-md">
+    <div className="min-h-screen flex flex-col bg-cream">
+      {/* Logo/Header */}
+      <div className="container mx-auto px-4 py-6">
+        <Link to="/" className="inline-block">
+          <h1 className="text-2xl font-bold text-lightblue">Petflix</h1>
+        </Link>
+      </div>
+
+      <div className="flex-1 flex items-center justify-center p-4">
+        <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle className="text-2xl text-center">Forgot Password?</CardTitle>
           <CardDescription className="text-center">
@@ -126,6 +143,7 @@ export default function ForgotPasswordPage() {
           </form>
         </CardContent>
       </Card>
+      </div>
     </div>
   );
 }
