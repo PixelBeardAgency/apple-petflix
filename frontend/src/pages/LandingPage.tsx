@@ -156,6 +156,24 @@ export function LandingPage() {
           )}
         </div>
 
+        {/* Empty state when no videos */}
+        {!loadingTrending && !trendingError && trendingVideos.length === 0 && (
+          <div className="mt-16 sm:mt-24 max-w-7xl mx-auto text-center py-12">
+            <div className="text-6xl mb-4">🐾</div>
+            <h3 className="text-xl font-semibold text-foreground mb-2">
+              No trending videos available right now
+            </h3>
+            <p className="text-muted-foreground mb-6">
+              Check back soon or search for your favorite pet videos!
+            </p>
+            <Link to="/search">
+              <Button size="lg">
+                🔍 Search Pet Videos
+              </Button>
+            </Link>
+          </div>
+        )}
+
         {/* Features Section */}
         <div className="mt-16 sm:mt-24 grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 max-w-5xl mx-auto">
           <div className="text-center space-y-3 p-4">
