@@ -129,6 +129,7 @@ export class YouTubeService {
     try {
       const response = await youtube.search.list({
         part: ['snippet'],
+        q: 'pets animals cats dogs', // Add broad pet-related query
         type: ['video'],
         maxResults,
         order: 'viewCount',
