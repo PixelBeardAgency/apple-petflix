@@ -169,30 +169,38 @@ export function LandingPage() {
                       </Link>
                     </div>
 
-                    {/* Upvote/Downvote */}
+                    {/* Upvote/Downvote - prompts to share first */}
                     <div className="flex flex-col items-center gap-1 flex-shrink-0">
                       <button
                         onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           if (!user) {
                             window.location.href = '/login';
+                          } else {
+                            // Redirect to share page so they can share it first
+                            window.location.href = `/share?videoId=${video.id}`;
                           }
                         }}
                         className="p-1 hover:bg-accent rounded transition-colors"
-                        title={user ? "Upvote" : "Sign in to vote"}
+                        title={user ? "Share to vote" : "Sign in to vote"}
                       >
                         <ArrowUp className="h-4 w-4 text-muted-foreground hover:text-orange-500" />
                       </button>
-                      <span className="text-xs font-medium text-foreground">0</span>
+                      <span className="text-xs font-medium text-foreground">-</span>
                       <button
                         onClick={(e) => {
                           e.preventDefault();
+                          e.stopPropagation();
                           if (!user) {
                             window.location.href = '/login';
+                          } else {
+                            // Redirect to share page so they can share it first
+                            window.location.href = `/share?videoId=${video.id}`;
                           }
                         }}
                         className="p-1 hover:bg-accent rounded transition-colors"
-                        title={user ? "Downvote" : "Sign in to vote"}
+                        title={user ? "Share to vote" : "Sign in to vote"}
                       >
                         <ArrowDown className="h-4 w-4 text-muted-foreground hover:text-blue-500" />
                       </button>

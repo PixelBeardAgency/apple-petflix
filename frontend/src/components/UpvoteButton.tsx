@@ -3,6 +3,7 @@ import { ArrowUp, ArrowDown } from 'lucide-react';
 import { Button } from './ui/button';
 import { useAuth } from '../contexts/AuthContext';
 import { supabase } from '../lib/supabase';
+import { API_URL } from '../config/api';
 
 interface UpvoteButtonProps {
   videoId: string;
@@ -31,7 +32,7 @@ export function UpvoteButton({ videoId, initialVoteCount = 0, className = '' }: 
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) return;
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/videos/${videoId}/vote`, {
+      const response = await fetch(`${API_URL}/api/videos/${videoId}/vote`, {
         headers: {
           'Authorization': `Bearer ${session.access_token}`,
         },
@@ -62,7 +63,7 @@ export function UpvoteButton({ videoId, initialVoteCount = 0, className = '' }: 
 
       // If clicking the same vote type, remove the vote
       if (userVote === voteType) {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/videos/${videoId}/vote`, {
+        const response = await fetch(`${API_URL}/api/videos/${videoId}/vote`, {
           method: 'DELETE',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
@@ -77,7 +78,7 @@ export function UpvoteButton({ videoId, initialVoteCount = 0, className = '' }: 
         }
       } else {
         // Vote or change vote
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:3000'}/api/videos/${videoId}/vote`, {
+        const response = await fetch(`${API_URL}/api/videos/${videoId}/vote`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${session.access_token}`,
