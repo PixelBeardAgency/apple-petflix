@@ -26,14 +26,36 @@ export function LandingPage() {
       console.log('Loading trending videos from:', `${import.meta.env.VITE_API_URL || ''}/api/youtube/trending`);
       const result = await youtubeAPI.getTrendingVideos(12);
       console.log('Trending videos result:', result);
-      setTrendingVideos(result.videos);
+      console.log('Videos array:', result.videos);
+      console.log('Videos count:', result.videos?.length);
+      
+      if (result.videos && Array.isArray(result.videos)) {
+        setTrendingVideos(result.videos);
+        console.log('State updated with', result.videos.length, 'videos');
+      } else {
+        console.error('Invalid videos data structure:', result);
+        setTrendingError('Invalid data received from API');
+      }
     } catch (err) {
       console.error('Failed to load trending videos:', err);
       setTrendingError(err instanceof Error ? err.message : 'Failed to load trending videos');
     } finally {
       setLoadingTrending(false);
+      console.log('Loading complete. State:', { 
+        loading: false, 
+        videosCount: trendingVideos.length,
+        error: trendingError 
+      });
     }
   };
+
+  // Debug: Log current state
+  console.log('Render state:', {
+    loadingTrending,
+    trendingError,
+    trendingVideosCount: trendingVideos.length,
+    trendingVideos: trendingVideos.slice(0, 2) // First 2 videos for inspection
+  });
 
   return (
     <div className="min-h-screen bg-background">
